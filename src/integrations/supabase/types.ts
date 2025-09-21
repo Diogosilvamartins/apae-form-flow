@@ -17,6 +17,8 @@ export type Database = {
       agendamentos: {
         Row: {
           assistido_id: string
+          confirmado_em: string | null
+          confirmado_por_telefone: string | null
           created_at: string
           criado_por: string
           data_hora: string
@@ -25,10 +27,13 @@ export type Database = {
           observacoes: string | null
           profissional_id: string
           status: Database["public"]["Enums"]["status_agendamento"]
+          token_confirmacao: string | null
           updated_at: string
         }
         Insert: {
           assistido_id: string
+          confirmado_em?: string | null
+          confirmado_por_telefone?: string | null
           created_at?: string
           criado_por: string
           data_hora: string
@@ -37,10 +42,13 @@ export type Database = {
           observacoes?: string | null
           profissional_id: string
           status?: Database["public"]["Enums"]["status_agendamento"]
+          token_confirmacao?: string | null
           updated_at?: string
         }
         Update: {
           assistido_id?: string
+          confirmado_em?: string | null
+          confirmado_por_telefone?: string | null
           created_at?: string
           criado_por?: string
           data_hora?: string
@@ -49,6 +57,7 @@ export type Database = {
           observacoes?: string | null
           profissional_id?: string
           status?: Database["public"]["Enums"]["status_agendamento"]
+          token_confirmacao?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -399,6 +408,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      gerar_token_confirmacao: {
+        Args: { agendamento_id: string }
+        Returns: string
+      }
       is_admin: {
         Args: { _uid?: string }
         Returns: boolean
