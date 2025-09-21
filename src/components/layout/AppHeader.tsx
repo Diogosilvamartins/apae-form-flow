@@ -26,9 +26,10 @@ export function AppHeader() {
 
   const getTipoUsuarioLabel = (tipo: string) => {
     const labels = {
-      admin: 'Administrador',
-      funcionario: 'Funcionário',
-      responsavel: 'Responsável'
+      administrador: 'Administrador',
+      psicologo: 'Psicólogo',
+      assistente_social: 'Assistente Social',
+      secretaria: 'Secretária'
     };
     return labels[tipo as keyof typeof labels] || tipo;
   };
@@ -59,9 +60,10 @@ export function AppHeader() {
               <div className="flex flex-col space-y-1">
                 <p className="text-sm font-medium">{user?.user_metadata?.nome || user?.email}</p>
                 <p className="text-xs text-muted-foreground">{user?.email}</p>
-                <p className="text-xs text-muted-foreground">
-                  {user?.user_metadata?.tipo_usuario ? getTipoUsuarioLabel(user.user_metadata.tipo_usuario) : ''}
-                </p>
+                 <p className="text-xs text-muted-foreground">
+                   {((user as any)?.tipo_usuario || user?.user_metadata?.tipo_usuario) ? 
+                     getTipoUsuarioLabel((user as any).tipo_usuario || user.user_metadata.tipo_usuario) : ''}
+                 </p>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />

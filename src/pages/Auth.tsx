@@ -15,7 +15,7 @@ export default function Auth() {
     email: '', 
     senha: '', 
     nome: '', 
-    tipo: 'funcionario' 
+    tipo: 'psicologo' 
   });
   const [loading, setLoading] = useState(false);
   const { user, signIn, signUp, resendConfirmation } = useAuth();
@@ -248,9 +248,10 @@ export default function Auth() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="admin">Administrador</SelectItem>
-                      <SelectItem value="funcionario">Funcionário</SelectItem>
-                      <SelectItem value="responsavel">Responsável</SelectItem>
+                      <SelectItem value="administrador">Administrador</SelectItem>
+                      <SelectItem value="psicologo">Psicólogo</SelectItem>
+                      <SelectItem value="assistente_social">Assistente Social</SelectItem>
+                      <SelectItem value="secretaria">Secretária</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -277,7 +278,7 @@ export default function Auth() {
             <div className="space-y-1 text-xs">
               <p><strong>1.</strong> Clique em "Cadastro" para criar sua conta</p>
               <p><strong>2.</strong> Ou faça login se já tiver uma conta</p>
-              <p><strong>3.</strong> Escolha o tipo: Admin, Funcionário ou Responsável</p>
+              <p><strong>3.</strong> Escolha o tipo: Administrador, Psicólogo, Assistente Social ou Secretária</p>
             </div>
           </div>
         </CardContent>

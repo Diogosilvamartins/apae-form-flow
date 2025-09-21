@@ -135,7 +135,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const enhancedUser = user ? {
     ...user,
     nome: user.user_metadata?.nome || user.email?.split('@')[0] || 'Usuário',
-    tipo_usuario: role || user.user_metadata?.tipo_usuario || 'funcionario',
+    tipo_usuario: role || user.user_metadata?.tipo_usuario || 'psicologo',
   } as any : null;
 
   return (

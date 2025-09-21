@@ -15,13 +15,13 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 
 const menuItems = [
-  { title: "Usuários", url: "/usuarios", icon: Users, roles: ["admin"] },
-  { title: "Assistidos", url: "/assistidos", icon: UserCheck, roles: ["admin", "funcionario"] },
-  { title: "Categorias", url: "/categorias", icon: FolderOpen, roles: ["admin", "funcionario"] },
-  { title: "Perguntas", url: "/perguntas", icon: HelpCircle, roles: ["admin", "funcionario"] },
-  { title: "Respostas", url: "/respostas", icon: MessageSquare, roles: ["admin", "funcionario", "responsavel"] },
-  { title: "Histórico", url: "/historico", icon: History, roles: ["admin", "funcionario", "responsavel"] },
-  { title: "Instruções", url: "/instrucoes", icon: Settings, roles: ["admin", "funcionario", "responsavel"] },
+  { title: "Usuários", url: "/usuarios", icon: Users, roles: ["administrador"] },
+  { title: "Assistidos", url: "/assistidos", icon: UserCheck, roles: ["administrador", "psicologo", "assistente_social"] },
+  { title: "Categorias", url: "/categorias", icon: FolderOpen, roles: ["administrador", "psicologo", "assistente_social"] },
+  { title: "Perguntas", url: "/perguntas", icon: HelpCircle, roles: ["administrador", "psicologo", "assistente_social"] },
+  { title: "Respostas", url: "/respostas", icon: MessageSquare, roles: ["administrador", "psicologo", "assistente_social", "secretaria"] },
+  { title: "Histórico", url: "/historico", icon: History, roles: ["administrador", "psicologo", "assistente_social", "secretaria"] },
+  { title: "Instruções", url: "/instrucoes", icon: Settings, roles: ["administrador", "psicologo", "assistente_social", "secretaria"] },
 ];
 
 export function AppSidebar() {
@@ -33,8 +33,9 @@ export function AppSidebar() {
 
   const isActive = (path: string) => currentPath === path;
   const hasAccess = (roles: string[]) => {
-    if (!user?.user_metadata?.tipo_usuario) return false;
-    return roles.includes(user.user_metadata.tipo_usuario);
+    const userType = (user as any)?.tipo_usuario || user?.user_metadata?.tipo_usuario;
+    if (!userType) return false;
+    return roles.includes(userType);
   };
 
   const visibleItems = menuItems.filter(item => hasAccess(item.roles));

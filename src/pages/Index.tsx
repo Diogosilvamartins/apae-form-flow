@@ -12,7 +12,7 @@ const Index = () => {
       description: "Gerenciar usuários do sistema",
       count: "---",
       href: "/usuarios",
-      roles: ["admin"]
+      roles: ["administrador"]
     },
     {
       title: "Assistidos",
@@ -20,7 +20,7 @@ const Index = () => {
       description: "Cadastro de pessoas assistidas",
       count: "---",
       href: "/assistidos",
-      roles: ["admin", "funcionario"]
+      roles: ["administrador", "psicologo", "assistente_social"]
     },
     {
       title: "Categorias",
@@ -28,7 +28,7 @@ const Index = () => {
       description: "Organização das perguntas",
       count: "---",
       href: "/categorias",
-      roles: ["admin", "funcionario"]
+      roles: ["administrador", "psicologo", "assistente_social"]
     },
     {
       title: "Perguntas",
@@ -36,7 +36,7 @@ const Index = () => {
       description: "Questionários do sistema",
       count: "---",
       href: "/perguntas",
-      roles: ["admin", "funcionario"]
+      roles: ["administrador", "psicologo", "assistente_social"]
     },
     {
       title: "Respostas",
@@ -44,7 +44,7 @@ const Index = () => {
       description: "Respostas dos assistidos",
       count: "---",
       href: "/respostas",
-      roles: ["admin", "funcionario", "responsavel"]
+      roles: ["administrador", "psicologo", "assistente_social", "secretaria"]
     },
     {
       title: "Histórico",
@@ -52,22 +52,24 @@ const Index = () => {
       description: "Auditoria de alterações",
       count: "---",
       href: "/historico",
-      roles: ["admin", "funcionario", "responsavel"]
+      roles: ["administrador", "psicologo", "assistente_social", "secretaria"]
     }
   ];
 
   const hasAccess = (roles: string[]) => {
-    if (!user?.user_metadata?.tipo_usuario) return false;
-    return roles.includes(user.user_metadata.tipo_usuario);
+    const userType = (user as any)?.tipo_usuario || user?.user_metadata?.tipo_usuario;
+    if (!userType) return false;
+    return roles.includes(userType);
   };
 
   const visibleStats = stats.filter(stat => hasAccess(stat.roles));
 
   const getTipoUsuarioLabel = (tipo: string) => {
     const labels = {
-      admin: 'Administrador',
-      funcionario: 'Funcionário',
-      responsavel: 'Responsável',
+      administrador: 'Administrador',
+      psicologo: 'Psicólogo',
+      assistente_social: 'Assistente Social',
+      secretaria: 'Secretária',
     };
     return labels[tipo as keyof typeof labels] || tipo;
   };
@@ -80,7 +82,8 @@ const Index = () => {
           Bem-vindo ao Sistema APAE, {user?.user_metadata?.nome || user?.email}
         </p>
         <p className="text-sm text-muted-foreground">
-          Perfil: {user?.user_metadata?.tipo_usuario ? getTipoUsuarioLabel(user.user_metadata.tipo_usuario) : ''}
+          Perfil: {((user as any)?.tipo_usuario || user?.user_metadata?.tipo_usuario) ? 
+            getTipoUsuarioLabel((user as any)?.tipo_usuario || user?.user_metadata?.tipo_usuario) : ''}
         </p>
       </div>
 

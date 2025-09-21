@@ -41,13 +41,14 @@ export default function Usuarios() {
     nome: '',
     email: '',
     senha_hash: '',
-    tipo_usuario: 'funcionario',
+    tipo_usuario: 'psicologo',
   });
 
   const { usuarios, loading, createUsuario, updateUsuario, deleteUsuario } = useUsuarios();
   const { user: currentUser } = useAuth();
 
-  const isAdmin = currentUser?.user_metadata?.tipo_usuario === 'admin';
+  const isAdmin = (currentUser?.user_metadata?.tipo_usuario === 'administrador') || 
+                 (currentUser as any)?.tipo_usuario === 'administrador';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,7 +69,7 @@ export default function Usuarios() {
       nome: '',
       email: '',
       senha_hash: '',
-      tipo_usuario: 'funcionario',
+      tipo_usuario: 'psicologo',
     });
   };
 
@@ -91,18 +92,20 @@ export default function Usuarios() {
 
   const getTipoUsuarioLabel = (tipo: string) => {
     const labels = {
-      admin: 'Administrador',
-      funcionario: 'Funcionário',
-      responsavel: 'Responsável',
+      administrador: 'Administrador',
+      psicologo: 'Psicólogo',
+      assistente_social: 'Assistente Social',
+      secretaria: 'Secretária',
     };
     return labels[tipo as keyof typeof labels] || tipo;
   };
 
   const getTipoUsuarioVariant = (tipo: string) => {
     const variants = {
-      admin: 'destructive',
-      funcionario: 'default',
-      responsavel: 'secondary',
+      administrador: 'destructive',
+      psicologo: 'default',
+      assistente_social: 'secondary',
+      secretaria: 'outline',
     };
     return variants[tipo as keyof typeof variants] || 'outline';
   };
@@ -135,7 +138,7 @@ export default function Usuarios() {
                 nome: '',
                 email: '',
                 senha_hash: '',
-                tipo_usuario: 'funcionario',
+                tipo_usuario: 'psicologo',
               });
             }}>
               <Plus className="h-4 w-4 mr-2" />
@@ -195,9 +198,10 @@ export default function Usuarios() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="admin">Administrador</SelectItem>
-                    <SelectItem value="funcionario">Funcionário</SelectItem>
-                    <SelectItem value="responsavel">Responsável</SelectItem>
+                    <SelectItem value="administrador">Administrador</SelectItem>
+                    <SelectItem value="psicologo">Psicólogo</SelectItem>
+                    <SelectItem value="assistente_social">Assistente Social</SelectItem>
+                    <SelectItem value="secretaria">Secretária</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
