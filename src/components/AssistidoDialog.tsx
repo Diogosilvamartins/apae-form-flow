@@ -8,8 +8,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Camera } from "lucide-react";
+import { Camera, Loader2 } from "lucide-react";
 import { Assistido, CreateAssistidoData, UpdateAssistidoData } from "@/hooks/useAssistidos";
+import { validateCPF, formatCPF, formatCEP, validateCEP, fetchAddressByCEP } from "@/lib/validators";
+import { toast } from "sonner";
 
 interface AssistidoDialogProps {
   open: boolean;
@@ -117,6 +119,10 @@ export default function AssistidoDialog({
     paciente_ativo: true,
   });
   const [loading, setLoading] = useState(false);
+  const [loadingCEP, setLoadingCEP] = useState(false);
+  const [cpfError, setCpfError] = useState("");
+  const [cpfResponsavelError, setCpfResponsavelError] = useState("");
+  const [cepError, setCepError] = useState("");
 
   useEffect(() => {
     if (isEdit && assistido) {
@@ -176,6 +182,19 @@ export default function AssistidoDialog({
     e.preventDefault();
     
     if (!formData.nome.trim()) {
+      toast.error("Nome é obrigatório");
+      return;
+    }
+
+    // Validação de CPF se preenchido
+    if (formData.cpf && !validateCPF(formData.cpf)) {
+      toast.error("CPF inválido");
+      return;
+    }
+
+    // Validação de CPF do responsável se preenchido  
+    if (formData.cpf_responsavel && !validateCPF(formData.cpf_responsavel)) {
+      toast.error("CPF do responsável inválido");
       return;
     }
 
@@ -221,6 +240,79 @@ export default function AssistidoDialog({
 
   const handleSelectChange = (field: "sexo" | "estado_civil" | "parentesco" | "estado", value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  // Validação e formatação de CPF
+  const handleCPFChange = (field: "cpf" | "cpf_responsavel", value: string) => {
+    const cleanValue = value.replace(/\D/g, '');
+    const formattedValue = formatCPF(cleanValue);
+    
+    setFormData(prev => ({ ...prev, [field]: formattedValue }));
+    
+    if (cleanValue.length === 11) {
+      const isValid = validateCPF(cleanValue);
+      if (field === "cpf") {
+        setCpfError(isValid ? "" : "CPF inválido");
+      } else {
+        setCpfResponsavelError(isValid ? "" : "CPF inválido");
+      }
+    } else if (cleanValue.length > 0) {
+      if (field === "cpf") {
+        setCpfError("CPF deve conter 11 dígitos");
+      } else {
+        setCpfResponsavelError("CPF deve conter 11 dígitos");
+      }
+    } else {
+      if (field === "cpf") {
+        setCpfError("");
+      } else {
+        setCpfResponsavelError("");
+      }
+    }
+  };
+
+  // Busca automática de endereço por CEP
+  const handleCEPChange = async (value: string) => {
+    const cleanValue = value.replace(/\D/g, '');
+    const formattedValue = formatCEP(cleanValue);
+    
+    setFormData(prev => ({ ...prev, cep: formattedValue }));
+    
+    if (cleanValue.length === 8) {
+      if (validateCEP(cleanValue)) {
+        setLoadingCEP(true);
+        setCepError("");
+        
+        try {
+          const addressData = await fetchAddressByCEP(cleanValue);
+          
+          if (addressData) {
+            const fullAddress = `${addressData.logradouro}, ${addressData.bairro}`;
+            setFormData(prev => ({
+              ...prev,
+              endereco_completo: fullAddress,
+              cidade: addressData.localidade,
+              estado: addressData.uf
+            }));
+            toast.success("Endereço preenchido automaticamente!");
+          } else {
+            setCepError("CEP não encontrado");
+            toast.error("CEP não encontrado");
+          }
+        } catch (error) {
+          setCepError("Erro ao buscar CEP");
+          toast.error("Erro ao buscar CEP");
+        } finally {
+          setLoadingCEP(false);
+        }
+      } else {
+        setCepError("CEP inválido");
+      }
+    } else if (cleanValue.length > 0) {
+      setCepError("CEP deve conter 8 dígitos");
+    } else {
+      setCepError("");
+    }
   };
 
   return (
@@ -276,9 +368,11 @@ export default function AssistidoDialog({
                   <Input
                     id="cpf"
                     value={formData.cpf}
-                    onChange={(e) => handleInputChange("cpf", e.target.value)}
+                    onChange={(e) => handleCPFChange("cpf", e.target.value)}
                     placeholder="000.000.000-00"
+                    maxLength={14}
                   />
+                  {cpfError && <p className="text-sm text-destructive">{cpfError}</p>}
                 </div>
               </div>
 
@@ -374,12 +468,19 @@ export default function AssistidoDialog({
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="cep">CEP</Label>
-                  <Input
-                    id="cep"
-                    value={formData.cep}
-                    onChange={(e) => handleInputChange("cep", e.target.value)}
-                    placeholder="00000-000"
-                  />
+                  <div className="relative">
+                    <Input
+                      id="cep"
+                      value={formData.cep}
+                      onChange={(e) => handleCEPChange(e.target.value)}
+                      placeholder="00000-000"
+                      maxLength={9}
+                    />
+                    {loadingCEP && (
+                      <Loader2 className="absolute right-3 top-3 h-4 w-4 animate-spin text-muted-foreground" />
+                    )}
+                  </div>
+                  {cepError && <p className="text-sm text-destructive">{cepError}</p>}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="cidade">Cidade</Label>
@@ -435,9 +536,11 @@ export default function AssistidoDialog({
                   <Input
                     id="cpf_responsavel"
                     value={formData.cpf_responsavel}
-                    onChange={(e) => handleInputChange("cpf_responsavel", e.target.value)}
+                    onChange={(e) => handleCPFChange("cpf_responsavel", e.target.value)}
                     placeholder="000.000.000-00"
+                    maxLength={14}
                   />
+                  {cpfResponsavelError && <p className="text-sm text-destructive">{cpfResponsavelError}</p>}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="parentesco">Parentesco</Label>
