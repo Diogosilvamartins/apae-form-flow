@@ -10,6 +10,7 @@ import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import WhatsAppMethodDialog from "@/components/WhatsAppMethodDialog";
 import { useConfiguracoes } from "@/hooks/useConfiguracoes";
+import { EspecialidadeProfissional } from "@/hooks/useProfissionais";
 
 interface AgendamentoWhatsAppDialogProps {
   open: boolean;
@@ -32,6 +33,29 @@ export default function AgendamentoWhatsAppDialog({
     };
   };
 
+  const formatEspecialidade = (especialidade: string) => {
+    const especialidadeMap: { [key in EspecialidadeProfissional]: string } = {
+      'psicologo': 'Psicólogo(a)',
+      'assistente_social': 'Assistente Social',
+      'fonoaudiologo': 'Fonoaudiólogo(a)',
+      'fisioterapeuta': 'Fisioterapeuta',
+      'terapeuta_ocupacional': 'Terapeuta Ocupacional',
+      'pedagogo': 'Pedagogo(a)',
+      'nutricionista': 'Nutricionista',
+      'medico': 'Médico(a)',
+      'outro': 'Profissional'
+    };
+    
+    return especialidadeMap[especialidade as EspecialidadeProfissional] || 'Profissional';
+  };
+
+  const formatProfissional = () => {
+    if (!agendamento.profissionais) return 'Profissional não informado';
+    
+    const especialidadeFormatada = formatEspecialidade(agendamento.profissionais.especialidade);
+    return `${especialidadeFormatada} ${agendamento.profissionais.nome}`;
+  };
+
   const { data, hora } = formatDataHora();
   
   const gerarLinkConfirmacao = () => {
@@ -44,7 +68,7 @@ export default function AgendamentoWhatsAppDialog({
     `Este é um lembrete da sua consulta agendada na APAE de Governador Valadares:\n\n` +
     `📅 Data: ${data}\n` +
     `🕐 Horário: ${hora}\n` +
-    `👩‍⚕️ Profissional: ${agendamento.profissionais?.nome}\n` +
+    `👩‍⚕️ Profissional: ${formatProfissional()}\n` +
     `📍 Local: APAE Governador Valadares\n\n` +
     `✅ *CONFIRME SUA PRESENÇA CLICANDO AQUI:*\n${gerarLinkConfirmacao()}\n\n` +
     `Em caso de impossibilidade de comparecer, entre em contato conosco com antecedência.\n\n` +
@@ -89,7 +113,7 @@ export default function AgendamentoWhatsAppDialog({
         `Este é um lembrete da sua consulta agendada na APAE de Governador Valadares:\n\n` +
         `📅 Data: ${data}\n` +
         `🕐 Horário: ${hora}\n` +
-        `👩‍⚕️ Profissional: ${agendamento.profissionais?.nome}\n` +
+        `👩‍⚕️ Profissional: ${formatProfissional()}\n` +
         `📍 Local: APAE Governador Valadares\n\n` +
         `✅ *CONFIRME SUA PRESENÇA CLICANDO AQUI:*\n${gerarLinkConfirmacao()}\n\n` +
         `Atenciosamente,\nEquipe APAE`
@@ -99,7 +123,7 @@ export default function AgendamentoWhatsAppDialog({
       content: `Olá ${agendamento.assistidos?.nome}!\n\n` +
         `Gostaríamos de confirmar sua consulta:\n\n` +
         `📅 ${data} às ${hora}\n` +
-        `👩‍⚕️ Com ${agendamento.profissionais?.nome}\n\n` +
+        `👩‍⚕️ Com ${formatProfissional()}\n\n` +
         `Por favor, responda:\n` +
         `✅ CONFIRMO - se você virá\n` +
         `❌ NÃO POSSO - se precisar remarcar\n\n` +
@@ -125,7 +149,7 @@ export default function AgendamentoWhatsAppDialog({
             Lembrete de Consulta - {agendamento.assistidos?.nome}
           </DialogTitle>
           <DialogDescription>
-            {data} às {hora} com {agendamento.profissionais?.nome}
+            {data} às {hora} com {formatProfissional()}
             <br />
             Celular: {agendamento.assistidos?.celular || `Usando número padrão APAE (${getNumeroWhatsAppPadrao()})`}
           </DialogDescription>
