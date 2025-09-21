@@ -67,6 +67,30 @@ export default function WhatsAppMethodDialog({
       }
     },
     {
+      id: 'app',
+      title: 'Abrir no App',
+      description: 'Deep link whatsapp:// (recomendado quando web/api bloqueiam)',
+      icon: MessageCircle,
+      color: 'bg-emerald-600 hover:bg-emerald-700',
+      action: () => {
+        const encodedMessage = encodeURIComponent(message);
+        const appUrl = `whatsapp://send?phone=${formattedNumber}&text=${encodedMessage}`;
+        const intentUrl = `intent://send/?phone=${formattedNumber}&text=${encodedMessage}#Intent;scheme=whatsapp;package=com.whatsapp;end`;
+        try {
+          // Tenta abrir via esquema do app
+          window.location.href = appUrl;
+          setTimeout(() => {
+            // Fallback para Android/Chrome via intent se necessário
+            window.location.href = intentUrl;
+          }, 400);
+        } catch (_) {
+          window.location.href = intentUrl;
+        }
+        toast.success(`Abrindo app do WhatsApp para ${contactName}`);
+        onOpenChange(false);
+      }
+    },
+    {
       id: 'copy',
       title: 'Copiar Link',
       description: 'Copia o link para colar manualmente',
