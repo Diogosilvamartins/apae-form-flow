@@ -13,6 +13,7 @@ interface AuthContextType {
   loading: boolean;
   signIn: (email: string, senha: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
+  createTestUsers: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -39,7 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 .from('usuarios')
                 .select('*')
                 .eq('id_usuario', session.user.id)
-                .single();
+                .maybeSingle();
 
               if (error) {
                 console.error('Error fetching usuario:', error);
@@ -107,6 +108,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const createTestUsers = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('create-test-users', {
+        body: {},
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Usuários de teste criados",
+        description: "Agora você pode fazer login com as credenciais de teste.",
+      });
+
+      console.log('Resultado da criação de usuários:', data);
+    } catch (error) {
+      console.error('Erro ao criar usuários de teste:', error);
+      toast({
+        title: "Erro ao criar usuários",
+        description: "Verifique o console para mais detalhes.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -116,6 +143,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loading,
         signIn,
         signOut,
+        createTestUsers,
       }}
     >
       {children}

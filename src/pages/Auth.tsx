@@ -6,12 +6,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { Users } from 'lucide-react';
 
 export default function Auth() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [loading, setLoading] = useState(false);
-  const { user, signIn } = useAuth();
+  const [creatingUsers, setCreatingUsers] = useState(false);
+  const { user, signIn, createTestUsers } = useAuth();
   const { toast } = useToast();
 
   if (user) {
@@ -50,6 +52,15 @@ export default function Auth() {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCreateTestUsers = async () => {
+    setCreatingUsers(true);
+    try {
+      await createTestUsers();
+    } finally {
+      setCreatingUsers(false);
     }
   };
 
@@ -110,7 +121,39 @@ export default function Auth() {
             </Button>
           </form>
           
-          <div className="mt-6 p-4 bg-muted rounded-lg">
+          <div className="mt-6 space-y-4">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  Primeira vez usando?
+                </span>
+              </div>
+            </div>
+            
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={handleCreateTestUsers}
+              disabled={creatingUsers}
+            >
+              {creatingUsers ? (
+                <div className="flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+                  Criando usuários...
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  Criar Usuários de Teste
+                </div>
+              )}
+            </Button>
+          </div>
+          
+          <div className="mt-4 p-4 bg-muted rounded-lg">
             <p className="text-sm font-bold text-center mb-2">Credenciais de Teste:</p>
             <div className="space-y-1 text-xs">
               <div><strong>Admin:</strong> admin@apae.com | senha: 123456</div>
