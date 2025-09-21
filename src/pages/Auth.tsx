@@ -111,9 +111,12 @@ export default function Auth() {
           </form>
           
           <div className="mt-6 p-4 bg-muted rounded-lg">
-            <p className="text-sm text-muted-foreground text-center">
-              Para testar o sistema, você precisa criar usuários no banco de dados primeiro.
-            </p>
+            <p className="text-sm font-bold text-center mb-2">Credenciais de Teste:</p>
+            <div className="space-y-1 text-xs">
+              <div><strong>Admin:</strong> admin@apae.com | senha: 123456</div>
+              <div><strong>Funcionário:</strong> funcionario@apae.com | senha: 123456</div>
+              <div><strong>Responsável:</strong> responsavel@apae.com | senha: 123456</div>
+            </div>
           </div>
         </CardContent>
       </Card>

@@ -20,7 +20,7 @@ const Index = () => {
       description: "Cadastro de pessoas assistidas",
       count: "---",
       href: "/assistidos",
-      roles: ["admin", "secretaria", "psicologa"]
+      roles: ["admin", "funcionario"]
     },
     {
       title: "Categorias",
@@ -28,7 +28,7 @@ const Index = () => {
       description: "Organização das perguntas",
       count: "---",
       href: "/categorias",
-      roles: ["admin", "psicologa", "secretaria"]
+      roles: ["admin", "funcionario"]
     },
     {
       title: "Perguntas",
@@ -36,7 +36,7 @@ const Index = () => {
       description: "Questionários do sistema",
       count: "---",
       href: "/perguntas",
-      roles: ["admin", "psicologa", "secretaria"]
+      roles: ["admin", "funcionario"]
     },
     {
       title: "Respostas",
@@ -44,7 +44,7 @@ const Index = () => {
       description: "Respostas dos assistidos",
       count: "---",
       href: "/respostas",
-      roles: ["admin", "psicologa", "secretaria", "funcionario"]
+      roles: ["admin", "funcionario", "responsavel"]
     },
     {
       title: "Histórico",
@@ -52,7 +52,7 @@ const Index = () => {
       description: "Auditoria de alterações",
       count: "---",
       href: "/historico",
-      roles: ["admin", "psicologa", "secretaria", "funcionario"]
+      roles: ["admin", "funcionario", "responsavel"]
     }
   ];
 
@@ -66,9 +66,8 @@ const Index = () => {
   const getTipoUsuarioLabel = (tipo: string) => {
     const labels = {
       admin: 'Administrador',
-      secretaria: 'Secretária',
-      psicologa: 'Psicóloga',
       funcionario: 'Funcionário',
+      responsavel: 'Responsável',
     };
     return labels[tipo as keyof typeof labels] || tipo;
   };

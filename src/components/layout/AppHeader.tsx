@@ -27,9 +27,8 @@ export function AppHeader() {
   const getTipoUsuarioLabel = (tipo: string) => {
     const labels = {
       admin: 'Administrador',
-      secretaria: 'Secretária',
-      psicologa: 'Psicóloga',
-      assistente: 'Assistente'
+      funcionario: 'Funcionário',
+      responsavel: 'Responsável'
     };
     return labels[tipo as keyof typeof labels] || tipo;
   };

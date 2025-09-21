@@ -16,11 +16,11 @@ import { useAuth } from "@/hooks/useAuth";
 
 const menuItems = [
   { title: "Usuários", url: "/usuarios", icon: Users, roles: ["admin"] },
-  { title: "Assistidos", url: "/assistidos", icon: UserCheck, roles: ["admin", "secretaria", "psicologa"] },
-  { title: "Categorias", url: "/categorias", icon: FolderOpen, roles: ["admin", "psicologa", "secretaria"] },
-  { title: "Perguntas", url: "/perguntas", icon: HelpCircle, roles: ["admin", "psicologa", "secretaria"] },
-  { title: "Respostas", url: "/respostas", icon: MessageSquare, roles: ["admin", "psicologa", "secretaria", "assistente"] },
-  { title: "Histórico", url: "/historico", icon: History, roles: ["admin", "psicologa", "secretaria", "assistente"] },
+  { title: "Assistidos", url: "/assistidos", icon: UserCheck, roles: ["admin", "funcionario"] },
+  { title: "Categorias", url: "/categorias", icon: FolderOpen, roles: ["admin", "funcionario"] },
+  { title: "Perguntas", url: "/perguntas", icon: HelpCircle, roles: ["admin", "funcionario"] },
+  { title: "Respostas", url: "/respostas", icon: MessageSquare, roles: ["admin", "funcionario", "responsavel"] },
+  { title: "Histórico", url: "/historico", icon: History, roles: ["admin", "funcionario", "responsavel"] },
 ];
 
 export function AppSidebar() {

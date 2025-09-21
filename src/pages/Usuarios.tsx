@@ -92,9 +92,8 @@ export default function Usuarios() {
   const getTipoUsuarioLabel = (tipo: string) => {
     const labels = {
       admin: 'Administrador',
-      secretaria: 'Secretária',
-      psicologa: 'Psicóloga',
       funcionario: 'Funcionário',
+      responsavel: 'Responsável',
     };
     return labels[tipo as keyof typeof labels] || tipo;
   };
@@ -102,9 +101,8 @@ export default function Usuarios() {
   const getTipoUsuarioVariant = (tipo: string) => {
     const variants = {
       admin: 'destructive',
-      secretaria: 'default',
-      psicologa: 'secondary',
-      funcionario: 'outline',
+      funcionario: 'default',
+      responsavel: 'secondary',
     };
     return variants[tipo as keyof typeof variants] || 'outline';
   };
@@ -198,9 +196,8 @@ export default function Usuarios() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="admin">Administrador</SelectItem>
-                    <SelectItem value="secretaria">Secretária</SelectItem>
-                    <SelectItem value="psicologa">Psicóloga</SelectItem>
                     <SelectItem value="funcionario">Funcionário</SelectItem>
+                    <SelectItem value="responsavel">Responsável</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
