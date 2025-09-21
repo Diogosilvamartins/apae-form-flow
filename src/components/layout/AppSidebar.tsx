@@ -34,6 +34,7 @@ export function AppSidebar() {
   const isActive = (path: string) => currentPath === path;
   const hasAccess = (roles: string[]) => {
     const userType = (user as any)?.tipo_usuario || user?.user_metadata?.tipo_usuario;
+    console.log('Verificando acesso:', { userType, roles, user: user?.email });
     if (!userType) return false;
     return roles.includes(userType);
   };
@@ -41,18 +42,16 @@ export function AppSidebar() {
   const visibleItems = menuItems.filter(item => hasAccess(item.roles));
 
   return (
-    <Sidebar className={collapsed ? "w-14" : "w-60"} collapsible="icon">
+    <Sidebar className="w-60" variant="sidebar">
       <div className="p-4 border-b">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
             <span className="text-primary-foreground font-bold text-sm">A</span>
           </div>
-          {!collapsed && (
-            <div>
-              <h1 className="font-bold text-lg">APAE GV</h1>
-              <p className="text-xs text-muted-foreground">Sistema de Gestão</p>
-            </div>
-          )}
+          <div>
+            <h1 className="font-bold text-lg">APAE GV</h1>
+            <p className="text-xs text-muted-foreground">Sistema de Gestão</p>
+          </div>
         </div>
       </div>
 
@@ -74,7 +73,7 @@ export function AppSidebar() {
                       }
                     >
                       <item.icon className="mr-2 h-4 w-4" />
-                      {!collapsed && <span>{item.title}</span>}
+                      <span>{item.title}</span>
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
