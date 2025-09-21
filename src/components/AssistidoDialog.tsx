@@ -104,6 +104,7 @@ export default function AssistidoDialog({
     
     // Contato/Endereço
     endereco_completo: "",
+    numero: "",
     cep: "",
     cidade: "",
     estado: "",
@@ -140,6 +141,7 @@ export default function AssistidoDialog({
         foto_url: assistido.foto_url || "",
         
         endereco_completo: assistido.endereco_completo || "",
+        numero: assistido.numero || "",
         cep: assistido.cep || "",
         cidade: assistido.cidade || "",
         estado: assistido.estado || "",
@@ -165,6 +167,7 @@ export default function AssistidoDialog({
         email: "",
         foto_url: "",
         endereco_completo: "",
+        numero: "",
         cep: "",
         cidade: "",
         estado: "",
@@ -214,6 +217,7 @@ export default function AssistidoDialog({
         foto_url: formData.foto_url.trim() || undefined,
         
         endereco_completo: formData.endereco_completo.trim() || undefined,
+        numero: formData.numero.trim() || undefined,
         cep: formData.cep.trim() || undefined,
         cidade: formData.cidade.trim() || undefined,
         estado: formData.estado && formData.estado.trim() ? formData.estado : undefined,
@@ -287,14 +291,13 @@ export default function AssistidoDialog({
           const addressData = await fetchAddressByCEP(cleanValue);
           
           if (addressData) {
-            const fullAddress = `${addressData.logradouro}, ${addressData.bairro}`;
             setFormData(prev => ({
               ...prev,
-              endereco_completo: fullAddress,
+              endereco_completo: addressData.logradouro,
               cidade: addressData.localidade,
               estado: addressData.uf
             }));
-            toast.success("Endereço preenchido automaticamente!");
+            toast.success("Endereço preenchido automaticamente! Informe o número.");
           } else {
             setCepError("CEP não encontrado");
             toast.error("CEP não encontrado");
@@ -455,17 +458,25 @@ export default function AssistidoDialog({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="endereco_completo">Endereço Completo</Label>
-                <Textarea
+                <Label htmlFor="endereco_completo">Logradouro</Label>
+                <Input
                   id="endereco_completo"
                   value={formData.endereco_completo}
                   onChange={(e) => handleInputChange("endereco_completo", e.target.value)}
-                  placeholder="Digite o endereço completo"
-                  rows={2}
+                  placeholder="Rua, Avenida, etc."
                 />
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-4 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="numero">Número</Label>
+                  <Input
+                    id="numero"
+                    value={formData.numero}
+                    onChange={(e) => handleInputChange("numero", e.target.value)}
+                    placeholder="123"
+                  />
+                </div>
                 <div className="space-y-2">
                   <Label htmlFor="cep">CEP</Label>
                   <div className="relative">

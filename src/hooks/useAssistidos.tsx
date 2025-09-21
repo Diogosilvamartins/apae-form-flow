@@ -24,6 +24,7 @@ export interface Assistido {
   
   // Contato/Endereço
   endereco_completo?: string;
+  numero?: string;
   cep?: string;
   cidade?: string;
   estado?: string;
@@ -57,6 +58,7 @@ export interface CreateAssistidoData {
   
   // Contato/Endereço
   endereco_completo?: string;
+  numero?: string;
   cep?: string;
   cidade?: string;
   estado?: string;
@@ -91,6 +93,7 @@ export interface UpdateAssistidoData {
   
   // Contato/Endereço
   endereco_completo?: string;
+  numero?: string;
   cep?: string;
   cidade?: string;
   estado?: string;

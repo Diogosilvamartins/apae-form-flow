@@ -95,6 +95,7 @@ export type Database = {
           id_assistido: string
           nome: string
           nome_responsavel: string | null
+          numero: string | null
           observacoes_gerais: string | null
           paciente_ativo: boolean | null
           parentesco: Database["public"]["Enums"]["parentesco_tipo"] | null
@@ -122,6 +123,7 @@ export type Database = {
           id_assistido?: string
           nome: string
           nome_responsavel?: string | null
+          numero?: string | null
           observacoes_gerais?: string | null
           paciente_ativo?: boolean | null
           parentesco?: Database["public"]["Enums"]["parentesco_tipo"] | null
@@ -149,6 +151,7 @@ export type Database = {
           id_assistido?: string
           nome?: string
           nome_responsavel?: string | null
+          numero?: string | null
           observacoes_gerais?: string | null
           paciente_ativo?: boolean | null
           parentesco?: Database["public"]["Enums"]["parentesco_tipo"] | null
