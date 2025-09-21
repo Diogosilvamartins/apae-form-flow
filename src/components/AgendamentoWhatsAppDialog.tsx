@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Agendamento } from "@/hooks/useAgendamentos";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import WhatsAppMethodDialog from "@/components/WhatsAppMethodDialog";
 
 interface AgendamentoWhatsAppDialogProps {
   open: boolean;
@@ -42,6 +43,7 @@ export default function AgendamentoWhatsAppDialog({
     `Atenciosamente,\nEquipe APAE`
   );
   const [sending, setSending] = useState(false);
+  const [methodDialogOpen, setMethodDialogOpen] = useState(false);
 
   const formatPhoneNumber = (phone: string | undefined) => {
     // Se não tem número, usar o número padrão da APAE
@@ -63,27 +65,13 @@ export default function AgendamentoWhatsAppDialog({
   };
 
   const handleSendWhatsApp = async () => {
-    setSending(true);
-    
-    try {
-      const formattedNumber = formatPhoneNumber(agendamento.assistidos?.celular);
-      
-      if (!message.trim()) {
-        toast.error("Digite uma mensagem para enviar");
-        return;
-      }
-
-      const encodedMessage = encodeURIComponent(message);
-      const whatsappUrl = `https://wa.me/${formattedNumber}?text=${encodedMessage}`;
-      
-      window.open(whatsappUrl, '_blank');
-      toast.success(`Lembrete enviado para ${agendamento.assistidos?.nome}`);
-      onOpenChange(false);
-    } catch (error) {
-      toast.error("Erro ao abrir WhatsApp");
-    } finally {
-      setSending(false);
+    if (!message.trim()) {
+      toast.error("Digite uma mensagem para enviar");
+      return;
     }
+
+    const phoneToUse = agendamento.assistidos?.celular || '33984043348';
+    setMethodDialogOpen(true);
   };
 
   const predefinedMessages = [
@@ -189,7 +177,7 @@ export default function AgendamentoWhatsAppDialog({
             className="bg-green-600 hover:bg-green-700"
           >
             {sending ? (
-              "Enviando..."
+              "Abrindo..."
             ) : (
               <>
                 <Send className="h-4 w-4 mr-2" />
@@ -198,6 +186,19 @@ export default function AgendamentoWhatsAppDialog({
             )}
           </Button>
         </DialogFooter>
+
+        <WhatsAppMethodDialog
+          open={methodDialogOpen}
+          onOpenChange={(open) => {
+            setMethodDialogOpen(open);
+            if (!open) {
+              onOpenChange(false);
+            }
+          }}
+          phoneNumber={agendamento.assistidos?.celular || '33984043348'}
+          message={message}
+          contactName={agendamento.assistidos?.nome || 'Assistido'}
+        />
       </DialogContent>
     </Dialog>
   );

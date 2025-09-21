@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { MessageCircle, Send, Users } from "lucide-react";
+import { MessageCircle, Send, Users, Globe, Smartphone, Copy } from "lucide-react";
 import { toast } from "sonner";
 import { Assistido } from "@/hooks/useAssistidos";
 
@@ -24,6 +24,7 @@ export default function WhatsAppBulk({
   );
   const [selectedAssistidos, setSelectedAssistidos] = useState<string[]>([]);
   const [sending, setSending] = useState(false);
+  const [sendMethod, setSendMethod] = useState<'web' | 'api' | 'copy'>('api');
 
   // Filtrar apenas assistidos que têm celular
   const assistidosComCelular = assistidos.filter(a => a.celular && a.celular.trim() !== '');
@@ -76,24 +77,51 @@ export default function WhatsAppBulk({
         selectedAssistidos.includes(a.id_assistido)
       );
 
-      let successCount = 0;
-      
-      for (const assistido of selectedAssistidosData) {
-        const formattedNumber = formatPhoneNumber(assistido.celular!);
-        
-        if (formattedNumber) {
+      if (sendMethod === 'copy') {
+        // Gerar todos os links e copiar para clipboard
+        const links = selectedAssistidosData.map(assistido => {
+          const formattedNumber = formatPhoneNumber(assistido.celular!);
           const personalizedMessage = message.replace(/\{nome\}/g, assistido.nome);
           const encodedMessage = encodeURIComponent(personalizedMessage);
-          const whatsappUrl = `https://wa.me/${formattedNumber}?text=${encodedMessage}`;
-          
-          // Pequeno delay entre as aberturas para não sobrecarregar
-          await new Promise(resolve => setTimeout(resolve, 500));
-          window.open(whatsappUrl, '_blank');
-          successCount++;
-        }
-      }
+          return `${assistido.nome}: https://wa.me/${formattedNumber}?text=${encodedMessage}`;
+        }).join('\n\n');
 
-      toast.success(`${successCount} conversas do WhatsApp foram abertas`);
+        try {
+          await navigator.clipboard.writeText(links);
+          toast.success(`${selectedAssistidos.length} links copiados! Cole no bloco de notas e abra um por vez.`);
+        } catch (error) {
+          // Fallback para browsers que não suportam clipboard
+          const textArea = document.createElement('textarea');
+          textArea.value = links;
+          document.body.appendChild(textArea);
+          textArea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textArea);
+          toast.success(`${selectedAssistidos.length} links copiados! Cole no bloco de notas e abra um por vez.`);
+        }
+      } else {
+        // Abrir links diretamente
+        let successCount = 0;
+        const baseUrl = sendMethod === 'web' ? 'https://web.whatsapp.com/send' : 'https://wa.me';
+        
+        for (const assistido of selectedAssistidosData) {
+          const formattedNumber = formatPhoneNumber(assistido.celular!);
+          
+          if (formattedNumber) {
+            const personalizedMessage = message.replace(/\{nome\}/g, assistido.nome);
+            const encodedMessage = encodeURIComponent(personalizedMessage);
+            const whatsappUrl = `${baseUrl}?phone=${formattedNumber}&text=${encodedMessage}`;
+            
+            // Pequeno delay entre as aberturas para não sobrecarregar
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            window.open(whatsappUrl, '_blank');
+            successCount++;
+          }
+        }
+
+        toast.success(`${successCount} conversas do WhatsApp foram abertas`);
+      }
+      
       onOpenChange(false);
     } catch (error) {
       toast.error("Erro ao enviar mensagens em massa");
@@ -150,6 +178,50 @@ export default function WhatsAppBulk({
                   </div>
                 </Button>
               ))}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Método de Envio</Label>
+            <div className="grid grid-cols-3 gap-2">
+              <Button
+                type="button"
+                variant={sendMethod === 'api' ? 'default' : 'outline'}
+                onClick={() => setSendMethod('api')}
+                className="flex items-center gap-2 h-auto p-3"
+              >
+                <Smartphone className="h-4 w-4" />
+                <div className="text-left">
+                  <div className="font-medium text-xs">WhatsApp Direct</div>
+                  <div className="text-xs opacity-75">Mais confiável</div>
+                </div>
+              </Button>
+              
+              <Button
+                type="button"
+                variant={sendMethod === 'web' ? 'default' : 'outline'}
+                onClick={() => setSendMethod('web')}
+                className="flex items-center gap-2 h-auto p-3"
+              >
+                <Globe className="h-4 w-4" />
+                <div className="text-left">
+                  <div className="font-medium text-xs">WhatsApp Web</div>
+                  <div className="text-xs opacity-75">Pode bloquear</div>
+                </div>
+              </Button>
+              
+              <Button
+                type="button"
+                variant={sendMethod === 'copy' ? 'default' : 'outline'}
+                onClick={() => setSendMethod('copy')}
+                className="flex items-center gap-2 h-auto p-3"
+              >
+                <Copy className="h-4 w-4" />
+                <div className="text-left">
+                  <div className="font-medium text-xs">Copiar Links</div>
+                  <div className="text-xs opacity-75">Manual</div>
+                </div>
+              </Button>
             </div>
           </div>
 
@@ -222,20 +294,27 @@ export default function WhatsAppBulk({
           >
             Cancelar
           </Button>
-          <Button
-            onClick={handleSendBulkWhatsApp}
-            disabled={sending || selectedAssistidos.length === 0}
-            className="bg-green-600 hover:bg-green-700"
-          >
-            {sending ? (
-              "Enviando..."
-            ) : (
-              <>
-                <Send className="h-4 w-4 mr-2" />
-                Enviar para {selectedAssistidos.length} assistidos
-              </>
-            )}
-          </Button>
+            <Button
+              onClick={handleSendBulkWhatsApp}
+              disabled={sending || selectedAssistidos.length === 0}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              {sending ? (
+                "Processando..."
+              ) : (
+                <>
+                  {sendMethod === 'copy' ? (
+                    <Copy className="h-4 w-4 mr-2" />
+                  ) : (
+                    <Send className="h-4 w-4 mr-2" />
+                  )}
+                  {sendMethod === 'copy' 
+                    ? `Copiar ${selectedAssistidos.length} links`
+                    : `Enviar para ${selectedAssistidos.length} assistidos`
+                  }
+                </>
+              )}
+            </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

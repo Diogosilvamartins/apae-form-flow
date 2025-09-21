@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { MessageCircle, Send } from "lucide-react";
 import { toast } from "sonner";
 import { Assistido } from "@/hooks/useAssistidos";
+import WhatsAppMethodDialog from "@/components/WhatsAppMethodDialog";
 
 interface WhatsAppDialogProps {
   open: boolean;
@@ -22,6 +23,7 @@ export default function WhatsAppDialog({
     `Olá ${assistido.nome}, tudo bem?\n\nEste é um contato da APAE de Governador Valadares.\n\nAtenciosamente,\nEquipe APAE`
   );
   const [sending, setSending] = useState(false);
+  const [methodDialogOpen, setMethodDialogOpen] = useState(false);
 
   const formatPhoneNumber = (phone: string | undefined) => {
     // Se não tem número, usar o número padrão da APAE
@@ -43,27 +45,13 @@ export default function WhatsAppDialog({
   };
 
   const handleSendWhatsApp = async () => {
-    setSending(true);
-    
-    try {
-      const formattedNumber = formatPhoneNumber(assistido.celular);
-      
-      if (!message.trim()) {
-        toast.error("Digite uma mensagem para enviar");
-        return;
-      }
-
-      const encodedMessage = encodeURIComponent(message);
-      const whatsappUrl = `https://wa.me/${formattedNumber}?text=${encodedMessage}`;
-      
-      window.open(whatsappUrl, '_blank');
-      toast.success(`WhatsApp aberto para ${assistido.nome}`);
-      onOpenChange(false);
-    } catch (error) {
-      toast.error("Erro ao abrir WhatsApp");
-    } finally {
-      setSending(false);
+    if (!message.trim()) {
+      toast.error("Digite uma mensagem para enviar");
+      return;
     }
+
+    const phoneToUse = assistido.celular || '33984043348';
+    setMethodDialogOpen(true);
   };
 
   const predefinedMessages = [
@@ -157,6 +145,19 @@ export default function WhatsAppDialog({
             )}
           </Button>
         </DialogFooter>
+
+        <WhatsAppMethodDialog
+          open={methodDialogOpen}
+          onOpenChange={(open) => {
+            setMethodDialogOpen(open);
+            if (!open) {
+              onOpenChange(false);
+            }
+          }}
+          phoneNumber={assistido.celular || '33984043348'}
+          message={message}
+          contactName={assistido.nome}
+        />
       </DialogContent>
     </Dialog>
   );

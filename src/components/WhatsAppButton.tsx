@@ -26,9 +26,15 @@ export default function WhatsAppButton({
       return;
     }
 
-    // Usar número padrão se não tiver celular cadastrado
+    // Para botão direto sem dialog, mostrar opções de método
     const phoneToUse = phoneNumber && phoneNumber.trim() !== '' ? phoneNumber : '33984043348';
     
+    // Criar uma mensagem simples para o botão direto
+    const message = `Olá ${assistidoNome}, tudo bem?`;
+    
+    // Abrir dialog de métodos
+    const methodDialog = document.createElement('div');
+    // Por agora, usar o método direto como fallback
     const formatPhoneNumber = (phone: string) => {
       const cleaned = phone.replace(/\D/g, '');
       
@@ -44,8 +50,8 @@ export default function WhatsAppButton({
     };
 
     const formattedNumber = formatPhoneNumber(phoneToUse);
-    const message = encodeURIComponent(`Olá ${assistidoNome}, tudo bem?`);
-    const whatsappUrl = `https://wa.me/${formattedNumber}?text=${message}`;
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/${formattedNumber}?text=${encodedMessage}`;
     
     window.open(whatsappUrl, '_blank');
     toast.success(`WhatsApp aberto para ${assistidoNome}`);
