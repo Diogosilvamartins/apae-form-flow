@@ -45,8 +45,12 @@ export default function WhatsAppMethodDialog({
       icon: Globe,
       color: 'bg-green-600 hover:bg-green-700',
       action: () => {
+        console.log("🌐 WhatsApp Web - Mensagem original:", message);
+        console.log("🌐 WhatsApp Web - Número formatado:", formattedNumber);
         const encodedMessage = encodeURIComponent(message);
+        console.log("🌐 WhatsApp Web - Mensagem codificada:", encodedMessage);
         const whatsappUrl = `https://web.whatsapp.com/send?phone=${formattedNumber}&text=${encodedMessage}`;
+        console.log("🌐 WhatsApp Web - URL final:", whatsappUrl);
         window.open(whatsappUrl, '_blank');
         toast.success(`WhatsApp Web aberto para ${contactName}`);
         onOpenChange(false);
@@ -59,8 +63,12 @@ export default function WhatsAppMethodDialog({
       icon: Smartphone,
       color: 'bg-blue-600 hover:bg-blue-700',
       action: () => {
+        console.log("📱 WhatsApp Direct - Mensagem original:", message);
+        console.log("📱 WhatsApp Direct - Número formatado:", formattedNumber);
         const encodedMessage = encodeURIComponent(message);
+        console.log("📱 WhatsApp Direct - Mensagem codificada:", encodedMessage);
         const whatsappUrl = `https://wa.me/${formattedNumber}?text=${encodedMessage}`;
+        console.log("📱 WhatsApp Direct - URL final:", whatsappUrl);
         window.open(whatsappUrl, '_blank');
         toast.success(`WhatsApp aberto para ${contactName}`);
         onOpenChange(false);
@@ -73,9 +81,14 @@ export default function WhatsAppMethodDialog({
       icon: MessageCircle,
       color: 'bg-emerald-600 hover:bg-emerald-700',
       action: () => {
+        console.log("📲 WhatsApp App - Mensagem original:", message);
+        console.log("📲 WhatsApp App - Número formatado:", formattedNumber);
         const encodedMessage = encodeURIComponent(message);
+        console.log("📲 WhatsApp App - Mensagem codificada:", encodedMessage);
         const appUrl = `whatsapp://send?phone=${formattedNumber}&text=${encodedMessage}`;
         const intentUrl = `intent://send/?phone=${formattedNumber}&text=${encodedMessage}#Intent;scheme=whatsapp;package=com.whatsapp;end`;
+        console.log("📲 WhatsApp App - URL do app:", appUrl);
+        console.log("📲 WhatsApp App - URL intent:", intentUrl);
         try {
           // Tenta abrir via esquema do app
           window.location.href = appUrl;
