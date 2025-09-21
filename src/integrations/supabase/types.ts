@@ -14,7 +14,290 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      assistidos: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          data_nascimento: string | null
+          id_assistido: string
+          nome: string
+          observacoes: string | null
+          responsavel_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          data_nascimento?: string | null
+          id_assistido?: string
+          nome: string
+          observacoes?: string | null
+          responsavel_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          data_nascimento?: string | null
+          id_assistido?: string
+          nome?: string
+          observacoes?: string | null
+          responsavel_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assistidos_responsavel_id_fkey"
+            columns: ["responsavel_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id_usuario"]
+          },
+        ]
+      }
+      categorias: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          descricao: string | null
+          id_categoria: string
+          nome: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          descricao?: string | null
+          id_categoria?: string
+          nome: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          descricao?: string | null
+          id_categoria?: string
+          nome?: string
+        }
+        Relationships: []
+      }
+      historico_respostas: {
+        Row: {
+          created_at: string
+          id_historico: string
+          motivo_alteracao: string | null
+          resposta_anterior: Json | null
+          resposta_id: string
+          resposta_nova: Json
+          usuario_id: string
+        }
+        Insert: {
+          created_at?: string
+          id_historico?: string
+          motivo_alteracao?: string | null
+          resposta_anterior?: Json | null
+          resposta_id: string
+          resposta_nova: Json
+          usuario_id: string
+        }
+        Update: {
+          created_at?: string
+          id_historico?: string
+          motivo_alteracao?: string | null
+          resposta_anterior?: Json | null
+          resposta_id?: string
+          resposta_nova?: Json
+          usuario_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "historico_respostas_resposta_id_fkey"
+            columns: ["resposta_id"]
+            isOneToOne: false
+            referencedRelation: "respostas"
+            referencedColumns: ["id_resposta"]
+          },
+          {
+            foreignKeyName: "historico_respostas_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id_usuario"]
+          },
+        ]
+      }
+      perguntas: {
+        Row: {
+          ativo: boolean
+          categoria_id: string
+          created_at: string
+          descricao: string | null
+          id_pergunta: string
+          obrigatoria: boolean
+          opcoes_resposta: Json | null
+          ordem: number | null
+          tipo_pergunta: Database["public"]["Enums"]["tipo_pergunta"]
+          titulo: string
+        }
+        Insert: {
+          ativo?: boolean
+          categoria_id: string
+          created_at?: string
+          descricao?: string | null
+          id_pergunta?: string
+          obrigatoria?: boolean
+          opcoes_resposta?: Json | null
+          ordem?: number | null
+          tipo_pergunta: Database["public"]["Enums"]["tipo_pergunta"]
+          titulo: string
+        }
+        Update: {
+          ativo?: boolean
+          categoria_id?: string
+          created_at?: string
+          descricao?: string | null
+          id_pergunta?: string
+          obrigatoria?: boolean
+          opcoes_resposta?: Json | null
+          ordem?: number | null
+          tipo_pergunta?: Database["public"]["Enums"]["tipo_pergunta"]
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "perguntas_categoria_id_fkey"
+            columns: ["categoria_id"]
+            isOneToOne: false
+            referencedRelation: "categorias"
+            referencedColumns: ["id_categoria"]
+          },
+        ]
+      }
+      permissoes_pergunta: {
+        Row: {
+          created_at: string
+          id_permissao: string
+          pergunta_id: string
+          pode_responder: boolean
+          pode_visualizar: boolean
+          usuario_id: string
+        }
+        Insert: {
+          created_at?: string
+          id_permissao?: string
+          pergunta_id: string
+          pode_responder?: boolean
+          pode_visualizar?: boolean
+          usuario_id: string
+        }
+        Update: {
+          created_at?: string
+          id_permissao?: string
+          pergunta_id?: string
+          pode_responder?: boolean
+          pode_visualizar?: boolean
+          usuario_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "permissoes_pergunta_pergunta_id_fkey"
+            columns: ["pergunta_id"]
+            isOneToOne: false
+            referencedRelation: "perguntas"
+            referencedColumns: ["id_pergunta"]
+          },
+          {
+            foreignKeyName: "permissoes_pergunta_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id_usuario"]
+          },
+        ]
+      }
+      respostas: {
+        Row: {
+          assistido_id: string
+          created_at: string
+          id_resposta: string
+          observacoes: string | null
+          pergunta_id: string
+          resposta: Json
+          usuario_id: string
+        }
+        Insert: {
+          assistido_id: string
+          created_at?: string
+          id_resposta?: string
+          observacoes?: string | null
+          pergunta_id: string
+          resposta: Json
+          usuario_id: string
+        }
+        Update: {
+          assistido_id?: string
+          created_at?: string
+          id_resposta?: string
+          observacoes?: string | null
+          pergunta_id?: string
+          resposta?: Json
+          usuario_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "respostas_assistido_id_fkey"
+            columns: ["assistido_id"]
+            isOneToOne: false
+            referencedRelation: "assistidos"
+            referencedColumns: ["id_assistido"]
+          },
+          {
+            foreignKeyName: "respostas_pergunta_id_fkey"
+            columns: ["pergunta_id"]
+            isOneToOne: false
+            referencedRelation: "perguntas"
+            referencedColumns: ["id_pergunta"]
+          },
+          {
+            foreignKeyName: "respostas_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id_usuario"]
+          },
+        ]
+      }
+      usuarios: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          email: string
+          id_usuario: string
+          nome: string
+          senha_hash: string
+          tipo_usuario: Database["public"]["Enums"]["tipo_usuario"]
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          email: string
+          id_usuario?: string
+          nome: string
+          senha_hash: string
+          tipo_usuario?: Database["public"]["Enums"]["tipo_usuario"]
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          email?: string
+          id_usuario?: string
+          nome?: string
+          senha_hash?: string
+          tipo_usuario?: Database["public"]["Enums"]["tipo_usuario"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +306,8 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      tipo_pergunta: "multipla_escolha" | "texto_livre" | "escala" | "sim_nao"
+      tipo_usuario: "admin" | "funcionario" | "responsavel"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +434,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      tipo_pergunta: ["multipla_escolha", "texto_livre", "escala", "sim_nao"],
+      tipo_usuario: ["admin", "funcionario", "responsavel"],
+    },
   },
 } as const
