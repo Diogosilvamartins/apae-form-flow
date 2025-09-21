@@ -56,7 +56,7 @@ export default function WhatsAppBulk({
       return cleaned;
     }
     
-    return cleaned.length >= 10 ? cleaned : null;
+    return cleaned.length >= 10 ? cleaned : '5533999799138';
   };
 
   const handleSendBulkWhatsApp = async () => {

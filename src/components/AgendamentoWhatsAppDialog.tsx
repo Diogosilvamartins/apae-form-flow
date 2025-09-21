@@ -48,7 +48,7 @@ export default function AgendamentoWhatsAppDialog({
   const formatPhoneNumber = (phone: string | undefined) => {
     // Se não tem número, usar o número padrão da APAE
     if (!phone || phone.trim() === '') {
-      return '5533984043348';
+      return '5533999799138';
     }
     
     const cleaned = phone.replace(/\D/g, '');
@@ -61,7 +61,7 @@ export default function AgendamentoWhatsAppDialog({
       return cleaned;
     }
     
-    return cleaned.length >= 10 ? cleaned : '5533984043348';
+    return cleaned.length >= 10 ? cleaned : '5533999799138';
   };
 
   const handleSendWhatsApp = async () => {
@@ -70,7 +70,7 @@ export default function AgendamentoWhatsAppDialog({
       return;
     }
 
-    const phoneToUse = agendamento.assistidos?.celular || '33984043348';
+    const phoneToUse = agendamento.assistidos?.celular || '33999799138';
     setMethodDialogOpen(true);
   };
 
@@ -119,7 +119,7 @@ export default function AgendamentoWhatsAppDialog({
           <DialogDescription>
             {data} às {hora} com {agendamento.profissionais?.nome}
             <br />
-            Celular: {agendamento.assistidos?.celular || "Usando número padrão APAE (33) 98404-3348"}
+            Celular: {agendamento.assistidos?.celular || "Usando número padrão APAE (33) 99979-9138"}
           </DialogDescription>
         </DialogHeader>
 
@@ -195,7 +195,7 @@ export default function AgendamentoWhatsAppDialog({
               onOpenChange(false);
             }
           }}
-          phoneNumber={agendamento.assistidos?.celular || '33984043348'}
+          phoneNumber={agendamento.assistidos?.celular || '33999799138'}
           message={message}
           contactName={agendamento.assistidos?.nome || 'Assistido'}
         />

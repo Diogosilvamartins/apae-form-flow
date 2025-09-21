@@ -27,7 +27,7 @@ export default function WhatsAppButton({
     }
 
     // Para botão direto sem dialog, mostrar opções de método
-    const phoneToUse = phoneNumber && phoneNumber.trim() !== '' ? phoneNumber : '33984043348';
+    const phoneToUse = phoneNumber && phoneNumber.trim() !== '' ? phoneNumber : '33999799138';
     
     // Criar uma mensagem simples para o botão direto
     const message = `Olá ${assistidoNome}, tudo bem?`;

@@ -28,7 +28,7 @@ export default function WhatsAppDialog({
   const formatPhoneNumber = (phone: string | undefined) => {
     // Se não tem número, usar o número padrão da APAE
     if (!phone || phone.trim() === '') {
-      return '5533984043348';
+      return '5533999799138';
     }
     
     const cleaned = phone.replace(/\D/g, '');
@@ -41,7 +41,7 @@ export default function WhatsAppDialog({
       return cleaned;
     }
     
-    return cleaned.length >= 10 ? cleaned : '5533984043348';
+    return cleaned.length >= 10 ? cleaned : '5533999799138';
   };
 
   const handleSendWhatsApp = async () => {
@@ -50,7 +50,7 @@ export default function WhatsAppDialog({
       return;
     }
 
-    const phoneToUse = assistido.celular || '33984043348';
+    const phoneToUse = assistido.celular || '33999799138';
     setMethodDialogOpen(true);
   };
 
@@ -78,7 +78,7 @@ export default function WhatsAppDialog({
             Enviar WhatsApp para {assistido.nome}
           </DialogTitle>
           <DialogDescription>
-            Celular: {assistido.celular || "Usando número padrão APAE (33) 98404-3348"}
+            Celular: {assistido.celular || "Usando número padrão APAE (33) 99979-9138"}
           </DialogDescription>
         </DialogHeader>
 
@@ -154,7 +154,7 @@ export default function WhatsAppDialog({
               onOpenChange(false);
             }
           }}
-          phoneNumber={assistido.celular || '33984043348'}
+          phoneNumber={assistido.celular || '33999799138'}
           message={message}
           contactName={assistido.nome}
         />
