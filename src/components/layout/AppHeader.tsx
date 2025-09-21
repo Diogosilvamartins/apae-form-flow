@@ -11,6 +11,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { LogOut, User } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import apaeLogoImg from "@/assets/apae-logo.jpg";
 
 export function AppHeader() {
   const { user, signOut } = useAuth();
@@ -35,21 +36,28 @@ export function AppHeader() {
   };
 
   return (
-    <header className="h-16 border-b bg-background flex items-center justify-between px-6">
+    <header className="h-16 border-b bg-gradient-to-r from-primary to-secondary flex items-center justify-between px-6">
       <div className="flex items-center gap-4">
-        <SidebarTrigger className="h-8 w-8" />
-        <div>
-          <h2 className="text-lg font-semibold">Sistema APAE</h2>
-          <p className="text-sm text-muted-foreground">Gestão de Assistidos</p>
+        <SidebarTrigger className="h-8 w-8 text-white hover:bg-white/10" />
+        <div className="flex items-center gap-3">
+          <img 
+            src={apaeLogoImg} 
+            alt="APAE Logo" 
+            className="h-10 w-10 rounded object-cover" 
+          />
+          <div>
+            <h2 className="text-lg font-semibold text-white">APAE - Governador Valadares</h2>
+            <p className="text-sm text-white/80">Sistema de Gestão de Assistidos</p>
+          </div>
         </div>
       </div>
 
       <div className="flex items-center gap-4">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+            <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:bg-white/10">
               <Avatar className="h-10 w-10">
-                <AvatarFallback className="bg-primary text-primary-foreground">
+                <AvatarFallback className="bg-white text-primary">
                   {user?.user_metadata?.nome ? getInitials(user.user_metadata.nome) : 'U'}
                 </AvatarFallback>
               </Avatar>

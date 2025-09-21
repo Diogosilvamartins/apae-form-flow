@@ -12,6 +12,31 @@ export interface Assistido {
   ativo: boolean;
   created_at: string;
   updated_at: string;
+  
+  // Dados Pessoais
+  cpf?: string;
+  rg?: string;
+  sexo?: "masculino" | "feminino" | "outro";
+  estado_civil?: "solteiro" | "casado" | "divorciado" | "viuvo" | "uniao_estavel" | "outro";
+  telefone?: string;
+  email?: string;
+  foto_url?: string;
+  
+  // Contato/Endereço
+  endereco_completo?: string;
+  cep?: string;
+  cidade?: string;
+  estado?: string;
+  
+  // Responsável
+  nome_responsavel?: string;
+  cpf_responsavel?: string;
+  parentesco?: "pai" | "mae" | "irmao" | "irma" | "avo" | "avo_materna" | "tio" | "tia" | "primo" | "prima" | "outro";
+  telefone_responsavel?: string;
+  
+  // Observações
+  observacoes_gerais?: string;
+  paciente_ativo?: boolean;
 }
 
 export interface CreateAssistidoData {
@@ -20,6 +45,31 @@ export interface CreateAssistidoData {
   celular?: string;
   observacoes?: string;
   responsavel_id?: string;
+  
+  // Dados Pessoais
+  cpf?: string;
+  rg?: string;
+  sexo?: "masculino" | "feminino" | "outro";
+  estado_civil?: "solteiro" | "casado" | "divorciado" | "viuvo" | "uniao_estavel" | "outro";
+  telefone?: string;
+  email?: string;
+  foto_url?: string;
+  
+  // Contato/Endereço
+  endereco_completo?: string;
+  cep?: string;
+  cidade?: string;
+  estado?: string;
+  
+  // Responsável
+  nome_responsavel?: string;
+  cpf_responsavel?: string;
+  parentesco?: "pai" | "mae" | "irmao" | "irma" | "avo" | "avo_materna" | "tio" | "tia" | "primo" | "prima" | "outro";
+  telefone_responsavel?: string;
+  
+  // Observações
+  observacoes_gerais?: string;
+  paciente_ativo?: boolean;
 }
 
 export interface UpdateAssistidoData {
@@ -29,6 +79,31 @@ export interface UpdateAssistidoData {
   observacoes?: string;
   responsavel_id?: string;
   ativo?: boolean;
+  
+  // Dados Pessoais
+  cpf?: string;
+  rg?: string;
+  sexo?: "masculino" | "feminino" | "outro";
+  estado_civil?: "solteiro" | "casado" | "divorciado" | "viuvo" | "uniao_estavel" | "outro";
+  telefone?: string;
+  email?: string;
+  foto_url?: string;
+  
+  // Contato/Endereço
+  endereco_completo?: string;
+  cep?: string;
+  cidade?: string;
+  estado?: string;
+  
+  // Responsável
+  nome_responsavel?: string;
+  cpf_responsavel?: string;
+  parentesco?: "pai" | "mae" | "irmao" | "irma" | "avo" | "avo_materna" | "tio" | "tia" | "primo" | "prima" | "outro";
+  telefone_responsavel?: string;
+  
+  // Observações
+  observacoes_gerais?: string;
+  paciente_ativo?: boolean;
 }
 
 export function useAssistidos() {

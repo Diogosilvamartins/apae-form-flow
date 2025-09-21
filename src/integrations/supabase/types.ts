@@ -81,34 +81,82 @@ export type Database = {
         Row: {
           ativo: boolean
           celular: string | null
+          cep: string | null
+          cidade: string | null
+          cpf: string | null
+          cpf_responsavel: string | null
           created_at: string
           data_nascimento: string | null
+          email: string | null
+          endereco_completo: string | null
+          estado: string | null
+          estado_civil: Database["public"]["Enums"]["estado_civil_tipo"] | null
+          foto_url: string | null
           id_assistido: string
           nome: string
-          observacoes: string | null
+          nome_responsavel: string | null
+          observacoes_gerais: string | null
+          paciente_ativo: boolean | null
+          parentesco: Database["public"]["Enums"]["parentesco_tipo"] | null
           responsavel_id: string | null
+          rg: string | null
+          sexo: Database["public"]["Enums"]["sexo_tipo"] | null
+          telefone: string | null
+          telefone_responsavel: string | null
           updated_at: string
         }
         Insert: {
           ativo?: boolean
           celular?: string | null
+          cep?: string | null
+          cidade?: string | null
+          cpf?: string | null
+          cpf_responsavel?: string | null
           created_at?: string
           data_nascimento?: string | null
+          email?: string | null
+          endereco_completo?: string | null
+          estado?: string | null
+          estado_civil?: Database["public"]["Enums"]["estado_civil_tipo"] | null
+          foto_url?: string | null
           id_assistido?: string
           nome: string
-          observacoes?: string | null
+          nome_responsavel?: string | null
+          observacoes_gerais?: string | null
+          paciente_ativo?: boolean | null
+          parentesco?: Database["public"]["Enums"]["parentesco_tipo"] | null
           responsavel_id?: string | null
+          rg?: string | null
+          sexo?: Database["public"]["Enums"]["sexo_tipo"] | null
+          telefone?: string | null
+          telefone_responsavel?: string | null
           updated_at?: string
         }
         Update: {
           ativo?: boolean
           celular?: string | null
+          cep?: string | null
+          cidade?: string | null
+          cpf?: string | null
+          cpf_responsavel?: string | null
           created_at?: string
           data_nascimento?: string | null
+          email?: string | null
+          endereco_completo?: string | null
+          estado?: string | null
+          estado_civil?: Database["public"]["Enums"]["estado_civil_tipo"] | null
+          foto_url?: string | null
           id_assistido?: string
           nome?: string
-          observacoes?: string | null
+          nome_responsavel?: string | null
+          observacoes_gerais?: string | null
+          paciente_ativo?: boolean | null
+          parentesco?: Database["public"]["Enums"]["parentesco_tipo"] | null
           responsavel_id?: string | null
+          rg?: string | null
+          sexo?: Database["public"]["Enums"]["sexo_tipo"] | null
+          telefone?: string | null
+          telefone_responsavel?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -458,6 +506,26 @@ export type Database = {
         | "nutricionista"
         | "medico"
         | "outro"
+      estado_civil_tipo:
+        | "solteiro"
+        | "casado"
+        | "divorciado"
+        | "viuvo"
+        | "uniao_estavel"
+        | "outro"
+      parentesco_tipo:
+        | "pai"
+        | "mae"
+        | "irmao"
+        | "irma"
+        | "avo"
+        | "avo_materna"
+        | "tio"
+        | "tia"
+        | "primo"
+        | "prima"
+        | "outro"
+      sexo_tipo: "masculino" | "feminino" | "outro"
       status_agendamento:
         | "agendado"
         | "confirmado"
@@ -609,6 +677,28 @@ export const Constants = {
         "medico",
         "outro",
       ],
+      estado_civil_tipo: [
+        "solteiro",
+        "casado",
+        "divorciado",
+        "viuvo",
+        "uniao_estavel",
+        "outro",
+      ],
+      parentesco_tipo: [
+        "pai",
+        "mae",
+        "irmao",
+        "irma",
+        "avo",
+        "avo_materna",
+        "tio",
+        "tia",
+        "primo",
+        "prima",
+        "outro",
+      ],
+      sexo_tipo: ["masculino", "feminino", "outro"],
       status_agendamento: [
         "agendado",
         "confirmado",
