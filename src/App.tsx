@@ -17,6 +17,7 @@ import Respostas from "./pages/Respostas";
 import Historico from "./pages/Historico";
 import Instructions from "./pages/Instructions";
 import NotFound from "./pages/NotFound";
+import Confirmar from "./pages/Confirmar";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ const App = () => (
         <AuthProvider>
           <Routes>
             <Route path="/auth" element={<Auth />} />
+            <Route path="/confirmar" element={<Confirmar />} />
             <Route path="/" element={<AppLayout><Index /></AppLayout>} />
             <Route path="/usuarios" element={<AppLayout><Usuarios /></AppLayout>} />
             <Route path="/assistidos" element={<AppLayout><Assistidos /></AppLayout>} />

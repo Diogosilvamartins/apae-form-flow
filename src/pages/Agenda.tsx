@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Calendar, Clock, User, Stethoscope, Edit, Trash2, MessageCircle } from "lucide-react";
+import { Plus, Calendar, Clock, User, Stethoscope, Edit, Trash2, MessageCircle, CheckCircle } from "lucide-react";
 import { useAgendamentos, Agendamento, CreateAgendamentoData, UpdateAgendamentoData, StatusAgendamento } from "@/hooks/useAgendamentos";
 import { format, parseISO, isToday, isTomorrow, addDays, startOfWeek, endOfWeek } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -217,6 +217,17 @@ export default function Agenda() {
                           <Badge variant={getStatusVariant(agendamento.status as StatusAgendamento)}>
                             {getStatusLabel(agendamento.status as StatusAgendamento)}
                           </Badge>
+                          {agendamento.confirmado_em ? (
+                            <div className="flex items-center gap-1 text-green-600 bg-green-50 px-2 py-1 rounded-full text-xs">
+                              <CheckCircle className="h-3 w-3" />
+                              <span>Confirmado</span>
+                            </div>
+                          ) : agendamento.status === 'agendado' && (
+                            <div className="flex items-center gap-1 text-orange-600 bg-orange-50 px-2 py-1 rounded-full text-xs">
+                              <Clock className="h-3 w-3" />
+                              <span>Pendente confirmação</span>
+                            </div>
+                          )}
                         </div>
                         
                         <div className="flex items-center gap-4">

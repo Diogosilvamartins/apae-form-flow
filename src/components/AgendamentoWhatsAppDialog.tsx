@@ -31,6 +31,11 @@ export default function AgendamentoWhatsAppDialog({
 
   const { data, hora } = formatDataHora();
   
+  const gerarLinkConfirmacao = () => {
+    if (!agendamento.token_confirmacao) return '';
+    return `${window.location.origin}/confirmar?token=${agendamento.token_confirmacao}`;
+  };
+
   const [message, setMessage] = useState(
     `Olá ${agendamento.assistidos?.nome}!\n\n` +
     `Este é um lembrete da sua consulta agendada na APAE de Governador Valadares:\n\n` +
@@ -38,7 +43,7 @@ export default function AgendamentoWhatsAppDialog({
     `🕐 Horário: ${hora}\n` +
     `👩‍⚕️ Profissional: ${agendamento.profissionais?.nome}\n` +
     `📍 Local: APAE Governador Valadares\n\n` +
-    `Por favor, confirme sua presença respondendo esta mensagem.\n\n` +
+    `✅ *CONFIRME SUA PRESENÇA CLICANDO AQUI:*\n${gerarLinkConfirmacao()}\n\n` +
     `Em caso de impossibilidade de comparecer, entre em contato conosco com antecedência.\n\n` +
     `Atenciosamente,\nEquipe APAE`
   );
@@ -83,7 +88,7 @@ export default function AgendamentoWhatsAppDialog({
         `🕐 Horário: ${hora}\n` +
         `👩‍⚕️ Profissional: ${agendamento.profissionais?.nome}\n` +
         `📍 Local: APAE Governador Valadares\n\n` +
-        `Por favor, confirme sua presença respondendo esta mensagem.\n\n` +
+        `✅ *CONFIRME SUA PRESENÇA CLICANDO AQUI:*\n${gerarLinkConfirmacao()}\n\n` +
         `Atenciosamente,\nEquipe APAE`
     },
     {

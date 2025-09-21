@@ -22,6 +22,9 @@ export interface Agendamento {
   criado_por: string;
   created_at: string;
   updated_at: string;
+  token_confirmacao?: string;
+  confirmado_em?: string | null;
+  confirmado_por_telefone?: string | null;
   // Relacionamentos
   assistidos?: {
     nome: string;
