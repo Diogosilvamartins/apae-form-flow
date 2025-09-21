@@ -34,7 +34,7 @@ export function AppSidebar() {
   const isActive = (path: string) => currentPath === path;
   const hasAccess = (roles: string[]) => {
     const userType = (user as any)?.tipo_usuario || user?.user_metadata?.tipo_usuario;
-    console.log('Verificando acesso:', { userType, roles, user: user?.email });
+    
     if (!userType) return false;
     return roles.includes(userType);
   };
@@ -42,7 +42,7 @@ export function AppSidebar() {
   const visibleItems = menuItems.filter(item => hasAccess(item.roles));
 
   return (
-    <Sidebar className="w-60" variant="sidebar">
+    <Sidebar className="w-60" variant="sidebar" collapsible="none">
       <div className="p-4 border-b">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
