@@ -92,6 +92,25 @@ export default function Configuracoes() {
     }
   };
 
+  const handleSaveEndereco = async () => {
+    setSaving('endereco');
+    try {
+      // Salvar todos os campos de endereço de uma vez
+      await Promise.all([
+        updateConfiguracao('endereco_logradouro', formData.endereco_logradouro),
+        updateConfiguracao('endereco_numero', formData.endereco_numero),
+        updateConfiguracao('endereco_cep', formData.endereco_cep),
+        updateConfiguracao('endereco_cidade', formData.endereco_cidade),
+        updateConfiguracao('endereco_estado', formData.endereco_estado),
+      ]);
+      toast.success('Endereço salvo com sucesso!');
+    } catch (error) {
+      toast.error('Erro ao salvar endereço');
+    } finally {
+      setSaving(null);
+    }
+  };
+
   const gerarBackup = async () => {
     setBackupLoading(true);
     try {
@@ -173,19 +192,15 @@ export default function Configuracoes() {
             toast.success("Endereço preenchido automaticamente! Informe o número.");
           } else {
             setCepError("CEP não encontrado");
-            toast.error("CEP não encontrado");
           }
         } catch (error) {
           setCepError("Erro ao buscar CEP");
-          toast.error("Erro ao buscar CEP");
         } finally {
           setLoadingCEP(false);
         }
       } else {
         setCepError("CEP inválido");
       }
-    } else if (cleanValue.length > 0) {
-      setCepError("CEP deve conter 8 dígitos");
     } else {
       setCepError("");
     }
@@ -308,141 +323,82 @@ export default function Configuracoes() {
                 
                 <div className="space-y-2">
                   <Label htmlFor="endereco_logradouro">Logradouro</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="endereco_logradouro"
-                      value={formData.endereco_logradouro}
-                      onChange={(e) => handleInputChange('endereco_logradouro', e.target.value)}
-                      placeholder="Rua, Avenida, etc."
-                      className="flex-1"
-                    />
-                    <Button 
-                      onClick={() => handleSave('endereco_logradouro')}
-                      disabled={saving === 'endereco_logradouro'}
-                      size="sm"
-                    >
-                      {saving === 'endereco_logradouro' ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Save className="h-4 w-4" />
-                      )}
-                      Salvar
-                    </Button>
-                  </div>
+                  <Input
+                    id="endereco_logradouro"
+                    value={formData.endereco_logradouro}
+                    onChange={(e) => handleInputChange('endereco_logradouro', e.target.value)}
+                    placeholder="Rua, Avenida, etc."
+                  />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="endereco_numero">Número</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        id="endereco_numero"
-                        value={formData.endereco_numero}
-                        onChange={(e) => handleInputChange('endereco_numero', e.target.value)}
-                        placeholder="123"
-                        className="flex-1"
-                      />
-                      <Button 
-                        onClick={() => handleSave('endereco_numero')}
-                        disabled={saving === 'endereco_numero'}
-                        size="sm"
-                      >
-                        {saving === 'endereco_numero' ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Save className="h-4 w-4" />
-                        )}
-                        Salvar
-                      </Button>
-                    </div>
+                    <Input
+                      id="endereco_numero"
+                      value={formData.endereco_numero}
+                      onChange={(e) => handleInputChange('endereco_numero', e.target.value)}
+                      placeholder="123"
+                    />
                   </div>
                   
                   <div className="space-y-2">
                     <Label htmlFor="endereco_cep">CEP</Label>
-                    <div className="flex gap-2">
-                      <div className="relative flex-1">
-                        <Input
-                          id="endereco_cep"
-                          value={formData.endereco_cep}
-                          onChange={(e) => handleCEPChange(e.target.value)}
-                          placeholder="00000-000"
-                          maxLength={9}
-                          className="flex-1"
-                        />
-                        {loadingCEP && (
-                          <Loader2 className="absolute right-3 top-3 h-4 w-4 animate-spin text-muted-foreground" />
-                        )}
-                      </div>
-                      <Button 
-                        onClick={() => handleSave('endereco_cep')}
-                        disabled={saving === 'endereco_cep'}
-                        size="sm"
-                      >
-                        {saving === 'endereco_cep' ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Save className="h-4 w-4" />
-                        )}
-                        Salvar
-                      </Button>
+                    <div className="relative">
+                      <Input
+                        id="endereco_cep"
+                        value={formData.endereco_cep}
+                        onChange={(e) => handleCEPChange(e.target.value)}
+                        placeholder="00000-000"
+                        maxLength={9}
+                      />
+                      {loadingCEP && (
+                        <Loader2 className="absolute right-3 top-3 h-4 w-4 animate-spin text-muted-foreground" />
+                      )}
                     </div>
                     {cepError && <p className="text-sm text-destructive">{cepError}</p>}
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="endereco_cidade">Cidade</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        id="endereco_cidade"
-                        value={formData.endereco_cidade}
-                        onChange={(e) => handleInputChange('endereco_cidade', e.target.value)}
-                        placeholder="Digite a cidade"
-                        className="flex-1"
-                      />
-                      <Button 
-                        onClick={() => handleSave('endereco_cidade')}
-                        disabled={saving === 'endereco_cidade'}
-                        size="sm"
-                      >
-                        {saving === 'endereco_cidade' ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Save className="h-4 w-4" />
-                        )}
-                        Salvar
-                      </Button>
-                    </div>
+                    <Input
+                      id="endereco_cidade"
+                      value={formData.endereco_cidade}
+                      onChange={(e) => handleInputChange('endereco_cidade', e.target.value)}
+                      placeholder="Digite a cidade"
+                    />
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="endereco_estado">Estado</Label>
-                    <div className="flex gap-2">
-                      <Select value={formData.endereco_estado} onValueChange={(value) => handleInputChange('endereco_estado', value)}>
-                        <SelectTrigger className="flex-1">
-                          <SelectValue placeholder="Selecione" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {estadosOptions.map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <Button 
-                        onClick={() => handleSave('endereco_estado')}
-                        disabled={saving === 'endereco_estado'}
-                        size="sm"
-                      >
-                        {saving === 'endereco_estado' ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Save className="h-4 w-4" />
-                        )}
-                        Salvar
-                      </Button>
-                    </div>
+                    <Select value={formData.endereco_estado} onValueChange={(value) => handleInputChange('endereco_estado', value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {estadosOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
+                </div>
+
+                <div className="flex justify-end">
+                  <Button 
+                    onClick={handleSaveEndereco}
+                    disabled={saving === 'endereco'}
+                    className="flex items-center gap-2"
+                  >
+                    {saving === 'endereco' ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Save className="h-4 w-4" />
+                    )}
+                    {saving === 'endereco' ? 'Salvando...' : 'Salvar Endereço'}
+                  </Button>
                 </div>
               </div>
             </div>
