@@ -169,6 +169,7 @@ export default function Configuracoes() {
 
   // Busca automática de endereço por CEP
   const handleCEPInputChange = (value: string) => {
+    console.log('[CONFIG] CEP change:', value);
     // Permite digitação livre (somente atualiza o estado)
     handleInputChange('endereco_cep', value);
     setCepError("");
