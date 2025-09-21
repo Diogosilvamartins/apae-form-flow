@@ -1,11 +1,153 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Users, UserCheck, FolderOpen, HelpCircle, MessageSquare, History } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const Index = () => {
+  const { usuario } = useAuth();
+
+  const stats = [
+    {
+      title: "Usuários",
+      icon: Users,
+      description: "Gerenciar usuários do sistema",
+      count: "---",
+      href: "/usuarios",
+      roles: ["admin"]
+    },
+    {
+      title: "Assistidos",
+      icon: UserCheck,
+      description: "Cadastro de pessoas assistidas",
+      count: "---",
+      href: "/assistidos",
+      roles: ["admin", "secretaria", "psicologa"]
+    },
+    {
+      title: "Categorias",
+      icon: FolderOpen,
+      description: "Organização das perguntas",
+      count: "---",
+      href: "/categorias",
+      roles: ["admin", "psicologa", "secretaria"]
+    },
+    {
+      title: "Perguntas",
+      icon: HelpCircle,
+      description: "Questionários do sistema",
+      count: "---",
+      href: "/perguntas",
+      roles: ["admin", "psicologa", "secretaria"]
+    },
+    {
+      title: "Respostas",
+      icon: MessageSquare,
+      description: "Respostas dos assistidos",
+      count: "---",
+      href: "/respostas",
+      roles: ["admin", "psicologa", "secretaria", "funcionario"]
+    },
+    {
+      title: "Histórico",
+      icon: History,
+      description: "Auditoria de alterações",
+      count: "---",
+      href: "/historico",
+      roles: ["admin", "psicologa", "secretaria", "funcionario"]
+    }
+  ];
+
+  const hasAccess = (roles: string[]) => {
+    if (!usuario?.tipo_usuario) return false;
+    return roles.includes(usuario.tipo_usuario);
+  };
+
+  const visibleStats = stats.filter(stat => hasAccess(stat.roles));
+
+  const getTipoUsuarioLabel = (tipo: string) => {
+    const labels = {
+      admin: 'Administrador',
+      secretaria: 'Secretária',
+      psicologa: 'Psicóloga',
+      funcionario: 'Funcionário',
+    };
+    return labels[tipo as keyof typeof labels] || tipo;
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <p className="text-muted-foreground">
+          Bem-vindo ao Sistema APAE, {usuario?.nome}
+        </p>
+        <p className="text-sm text-muted-foreground">
+          Perfil: {usuario?.tipo_usuario ? getTipoUsuarioLabel(usuario.tipo_usuario) : ''}
+        </p>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {visibleStats.map((stat) => {
+          const Icon = stat.icon;
+          return (
+            <Card key={stat.title} className="hover:shadow-md transition-shadow cursor-pointer">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  {stat.title}
+                </CardTitle>
+                <Icon className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stat.count}</div>
+                <CardDescription className="text-xs">
+                  {stat.description}
+                </CardDescription>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Atividades Recentes</CardTitle>
+            <CardDescription>
+              Últimas ações realizadas no sistema
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">
+                Nenhuma atividade recente para exibir.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Estatísticas</CardTitle>
+            <CardDescription>
+              Resumo geral do sistema
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-sm">Total de assistidos:</span>
+                <span className="text-sm font-medium">---</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm">Perguntas ativas:</span>
+                <span className="text-sm font-medium">---</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm">Respostas hoje:</span>
+                <span className="text-sm font-medium">---</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
