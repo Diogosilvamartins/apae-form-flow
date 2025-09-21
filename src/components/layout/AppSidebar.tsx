@@ -25,7 +25,7 @@ const menuItems = [
 ];
 
 export function AppSidebar() {
-  const { state } = useSidebar();
+  const { state, open } = useSidebar();
   const location = useLocation();
   const { user } = useAuth();
   const currentPath = location.pathname;
