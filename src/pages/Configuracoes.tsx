@@ -1,16 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Settings, Download, Upload, Smartphone, Building, MapPin, Save, Loader2 } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Settings, Download, Upload, Smartphone, Building, MapPin, Save, Loader2, AlertTriangle } from "lucide-react";
 import { useConfiguracoes } from "@/hooks/useConfiguracoes";
 import { useAgendamentos } from "@/hooks/useAgendamentos";
 import { useAssistidos } from "@/hooks/useAssistidos";
 import { useProfissionais } from "@/hooks/useProfissionais";
 import { formatCEP, validateCEP, fetchAddressByCEP } from "@/lib/validators";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -23,8 +25,10 @@ export default function Configuracoes() {
   
   const [saving, setSaving] = useState<string | null>(null);
   const [backupLoading, setBackupLoading] = useState(false);
+  const [restoreLoading, setRestoreLoading] = useState(false);
   const [loadingCEP, setLoadingCEP] = useState(false);
   const [cepError, setCepError] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const estadosOptions = [
     { value: "AC", label: "Acre" },
@@ -158,6 +162,108 @@ export default function Configuracoes() {
     } finally {
       setBackupLoading(false);
     }
+  };
+
+  const handleRestoreBackup = () => {
+    fileInputRef.current?.click();
+  };
+
+  const processBackupFile = async (file: File) => {
+    setRestoreLoading(true);
+    
+    try {
+      // Ler arquivo JSON
+      const text = await file.text();
+      const backup = JSON.parse(text);
+      
+      // Validar estrutura do backup
+      if (!backup.dados || !backup.versao) {
+        throw new Error('Formato de backup inválido');
+      }
+
+      const { dados } = backup;
+      
+      // Confirmar antes de restaurar
+      const confirmRestore = window.confirm(
+        `Deseja restaurar o backup?\n\n` +
+        `Este processo irá SUBSTITUIR todos os dados atuais:\n` +
+        `• ${dados.assistidos?.length || 0} assistidos\n` +
+        `• ${dados.agendamentos?.length || 0} agendamentos\n` +
+        `• ${dados.profissionais?.length || 0} profissionais\n` +
+        `• ${dados.configuracoes?.length || 0} configurações\n\n` +
+        `ATENÇÃO: Esta ação não pode ser desfeita!`
+      );
+
+      if (!confirmRestore) {
+        toast.info('Restauração cancelada');
+        return;
+      }
+
+      let restored = 0;
+      
+      // Limpar dados existentes e restaurar
+      if (dados.configuracoes?.length) {
+        await supabase.from('configuracoes').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        for (const config of dados.configuracoes) {
+          const { id, created_at, updated_at, ...configData } = config;
+          await supabase.from('configuracoes').insert(configData);
+          restored++;
+        }
+      }
+
+      if (dados.profissionais?.length) {
+        await supabase.from('profissionais').delete().neq('id_profissional', '00000000-0000-0000-0000-000000000000');
+        for (const prof of dados.profissionais) {
+          const { created_at, updated_at, ...profData } = prof;
+          await supabase.from('profissionais').insert(profData);
+          restored++;
+        }
+      }
+
+      if (dados.assistidos?.length) {
+        await supabase.from('assistidos').delete().neq('id_assistido', '00000000-0000-0000-0000-000000000000');
+        for (const assistido of dados.assistidos) {
+          const { created_at, updated_at, ...assistidoData } = assistido;
+          await supabase.from('assistidos').insert(assistidoData);
+          restored++;
+        }
+      }
+
+      if (dados.agendamentos?.length) {
+        await supabase.from('agendamentos').delete().neq('id_agendamento', '00000000-0000-0000-0000-000000000000');
+        for (const agendamento of dados.agendamentos) {
+          const { created_at, updated_at, ...agendamentoData } = agendamento;
+          await supabase.from('agendamentos').insert(agendamentoData);
+          restored++;
+        }
+      }
+
+      toast.success(`Backup restaurado com sucesso! ${restored} registros restaurados.`);
+      
+      // Recarregar a página para atualizar os dados
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+      
+    } catch (error) {
+      console.error('Erro ao restaurar backup:', error);
+      toast.error(`Erro ao restaurar backup: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
+    } finally {
+      setRestoreLoading(false);
+    }
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.type === 'application/json' || file.name.endsWith('.json')) {
+        processBackupFile(file);
+      } else {
+        toast.error('Selecione apenas arquivos JSON de backup');
+      }
+    }
+    // Limpar o input para permitir selecionar o mesmo arquivo novamente
+    event.target.value = '';
   };
 
   const handleInputChange = (chave: string, valor: string) => {
@@ -443,14 +549,51 @@ export default function Configuracoes() {
                 {backupLoading ? "Gerando..." : "Gerar Backup"}
               </Button>
               
-              <Button 
-                variant="outline"
-                disabled
-                className="flex items-center gap-2"
-              >
-                <Upload className="h-4 w-4" />
-                Restaurar Backup (Em breve)
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button 
+                    variant="outline"
+                    disabled={restoreLoading}
+                    className="flex items-center gap-2"
+                  >
+                    {restoreLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Upload className="h-4 w-4" />
+                    )}
+                    {restoreLoading ? "Restaurando..." : "Restaurar Backup"}
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="flex items-center gap-2">
+                      <AlertTriangle className="h-5 w-5 text-destructive" />
+                      Confirmar Restauração de Backup
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      <strong>ATENÇÃO:</strong> Restaurar um backup irá <strong>substituir TODOS os dados atuais</strong> do sistema.
+                      <br /><br />
+                      Esta ação não pode ser desfeita. Certifique-se de ter um backup atual antes de prosseguir.
+                      <br /><br />
+                      Deseja continuar?
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleRestoreBackup} className="bg-destructive hover:bg-destructive/90">
+                      Sim, Restaurar Backup
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+              
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".json,application/json"
+                onChange={handleFileChange}
+                className="hidden"
+              />
             </div>
 
             <Separator />
