@@ -188,8 +188,8 @@ export default function AssistidoDialog({
         
         cpf: formData.cpf.trim() || undefined,
         rg: formData.rg.trim() || undefined,
-        sexo: formData.sexo as "masculino" | "feminino" | "outro" | undefined,
-        estado_civil: formData.estado_civil as "solteiro" | "casado" | "divorciado" | "viuvo" | "uniao_estavel" | "outro" | undefined,
+        sexo: formData.sexo && formData.sexo.trim() ? formData.sexo as "masculino" | "feminino" | "outro" : undefined,
+        estado_civil: formData.estado_civil && formData.estado_civil.trim() ? formData.estado_civil as "solteiro" | "casado" | "divorciado" | "viuvo" | "uniao_estavel" | "outro" : undefined,
         telefone: formData.telefone.trim() || undefined,
         email: formData.email.trim() || undefined,
         foto_url: formData.foto_url.trim() || undefined,
@@ -197,11 +197,11 @@ export default function AssistidoDialog({
         endereco_completo: formData.endereco_completo.trim() || undefined,
         cep: formData.cep.trim() || undefined,
         cidade: formData.cidade.trim() || undefined,
-        estado: formData.estado || undefined,
+        estado: formData.estado && formData.estado.trim() ? formData.estado : undefined,
         
         nome_responsavel: formData.nome_responsavel.trim() || undefined,
         cpf_responsavel: formData.cpf_responsavel.trim() || undefined,
-        parentesco: formData.parentesco as "pai" | "mae" | "irmao" | "irma" | "avo" | "avo_materna" | "tio" | "tia" | "primo" | "prima" | "outro" | undefined,
+        parentesco: formData.parentesco && formData.parentesco.trim() ? formData.parentesco as "pai" | "mae" | "irmao" | "irma" | "avo" | "avo_materna" | "tio" | "tia" | "primo" | "prima" | "outro" : undefined,
         telefone_responsavel: formData.telefone_responsavel.trim() || undefined,
         
         observacoes_gerais: formData.observacoes_gerais.trim() || undefined,
