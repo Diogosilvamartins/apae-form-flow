@@ -19,6 +19,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [role, setRole] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -117,11 +118,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // Enhance user with metadata
+  // Load role from public.usuarios to ensure correct permissions
+  useEffect(() => {
+    if (!user?.id) return;
+    (async () => {
+      const { data, error } = await supabase
+        .from('usuarios')
+        .select('tipo_usuario')
+        .eq('id_usuario', user.id)
+        .maybeSingle();
+      if (!error) setRole(data?.tipo_usuario ?? null);
+    })();
+  }, [user?.id]);
+
+  // Enhance user with metadata and DB role
   const enhancedUser = user ? {
     ...user,
     nome: user.user_metadata?.nome || user.email?.split('@')[0] || 'Usuário',
-    tipo_usuario: user.user_metadata?.tipo_usuario || 'funcionario',
+    tipo_usuario: role || user.user_metadata?.tipo_usuario || 'funcionario',
   } as any : null;
 
   return (
