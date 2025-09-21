@@ -303,14 +303,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      is_admin: {
-        Args: { _uid?: string }
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
       tipo_pergunta: "multipla_escolha" | "texto_livre" | "escala" | "sim_nao"
-      tipo_usuario: "admin" | "funcionario" | "responsavel"
+      tipo_usuario:
+        | "administrador"
+        | "psicologo"
+        | "assistente_social"
+        | "secretaria"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -439,7 +440,12 @@ export const Constants = {
   public: {
     Enums: {
       tipo_pergunta: ["multipla_escolha", "texto_livre", "escala", "sim_nao"],
-      tipo_usuario: ["admin", "funcionario", "responsavel"],
+      tipo_usuario: [
+        "administrador",
+        "psicologo",
+        "assistente_social",
+        "secretaria",
+      ],
     },
   },
 } as const
