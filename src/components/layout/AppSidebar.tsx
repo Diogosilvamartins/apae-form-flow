@@ -1,4 +1,4 @@
-import { BarChart3, Users, UserCheck, FolderOpen, HelpCircle, MessageSquare, History, Settings, Stethoscope, Calendar } from "lucide-react";
+import { BarChart3, Users, UserCheck, FolderOpen, HelpCircle, MessageSquare, History, Settings, Stethoscope, Calendar, Cog } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
   Sidebar,
@@ -24,6 +24,7 @@ const menuItems = [
   { title: "Perguntas", url: "/perguntas", icon: HelpCircle, roles: ["administrador", "psicologo", "assistente_social"] },
   { title: "Respostas", url: "/respostas", icon: MessageSquare, roles: ["administrador", "psicologo", "assistente_social", "secretaria"] },
   { title: "Histórico", url: "/historico", icon: History, roles: ["administrador", "psicologo", "assistente_social", "secretaria"] },
+  { title: "Configurações", url: "/configuracoes", icon: Cog, roles: ["administrador"] },
   { title: "Instruções", url: "/instrucoes", icon: Settings, roles: ["administrador", "psicologo", "assistente_social", "secretaria"] },
 ];
 

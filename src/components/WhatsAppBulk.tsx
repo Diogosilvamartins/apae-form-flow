@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { MessageCircle, Send, Users, Globe, Smartphone, Copy } from "lucide-react";
 import { toast } from "sonner";
 import { Assistido } from "@/hooks/useAssistidos";
+import { useConfiguracoes } from "@/hooks/useConfiguracoes";
 
 interface WhatsAppBulkProps {
   open: boolean;
@@ -19,6 +20,8 @@ export default function WhatsAppBulk({
   onOpenChange,
   assistidos,
 }: WhatsAppBulkProps) {
+  const { getNumeroWhatsAppPadrao } = useConfiguracoes();
+  
   const [message, setMessage] = useState(
     "Olá! Este é um comunicado importante da APAE de Governador Valadares.\n\nAtenciosamente,\nEquipe APAE"
   );
@@ -56,7 +59,7 @@ export default function WhatsAppBulk({
       return cleaned;
     }
     
-    return cleaned.length >= 10 ? cleaned : '5533999799138';
+    return cleaned.length >= 10 ? cleaned : getNumeroWhatsAppPadrao();
   };
 
   const handleSendBulkWhatsApp = async () => {

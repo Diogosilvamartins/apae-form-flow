@@ -7,6 +7,7 @@ import { MessageCircle, Send } from "lucide-react";
 import { toast } from "sonner";
 import { Assistido } from "@/hooks/useAssistidos";
 import WhatsAppMethodDialog from "@/components/WhatsAppMethodDialog";
+import { useConfiguracoes } from "@/hooks/useConfiguracoes";
 
 interface WhatsAppDialogProps {
   open: boolean;
@@ -19,6 +20,8 @@ export default function WhatsAppDialog({
   onOpenChange,
   assistido,
 }: WhatsAppDialogProps) {
+  const { getNumeroWhatsAppPadrao } = useConfiguracoes();
+  
   const [message, setMessage] = useState(
     `Olá ${assistido.nome}, tudo bem?\n\nEste é um contato da APAE de Governador Valadares.\n\nAtenciosamente,\nEquipe APAE`
   );
@@ -28,7 +31,7 @@ export default function WhatsAppDialog({
   const formatPhoneNumber = (phone: string | undefined) => {
     // Se não tem número, usar o número padrão da APAE
     if (!phone || phone.trim() === '') {
-      return '5533999799138';
+      return getNumeroWhatsAppPadrao();
     }
     
     const cleaned = phone.replace(/\D/g, '');
@@ -41,7 +44,7 @@ export default function WhatsAppDialog({
       return cleaned;
     }
     
-    return cleaned.length >= 10 ? cleaned : '5533999799138';
+    return cleaned.length >= 10 ? cleaned : getNumeroWhatsAppPadrao();
   };
 
   const handleSendWhatsApp = async () => {
@@ -50,7 +53,7 @@ export default function WhatsAppDialog({
       return;
     }
 
-    const phoneToUse = assistido.celular || '33999799138';
+    const phoneToUse = assistido.celular || getNumeroWhatsAppPadrao();
     setMethodDialogOpen(true);
   };
 
@@ -78,7 +81,7 @@ export default function WhatsAppDialog({
             Enviar WhatsApp para {assistido.nome}
           </DialogTitle>
           <DialogDescription>
-            Celular: {assistido.celular || "Usando número padrão APAE (33) 99979-9138"}
+            Celular: {assistido.celular || `Usando número padrão APAE (${getNumeroWhatsAppPadrao()})`}
           </DialogDescription>
         </DialogHeader>
 
@@ -154,7 +157,7 @@ export default function WhatsAppDialog({
               onOpenChange(false);
             }
           }}
-          phoneNumber={assistido.celular || '33999799138'}
+          phoneNumber={assistido.celular || getNumeroWhatsAppPadrao()}
           message={message}
           contactName={assistido.nome}
         />

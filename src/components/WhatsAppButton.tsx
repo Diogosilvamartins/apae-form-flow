@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Assistido } from "@/hooks/useAssistidos";
+import { useConfiguracoes } from "@/hooks/useConfiguracoes";
 
 interface WhatsAppButtonProps {
   phoneNumber?: string;
@@ -20,6 +21,8 @@ export default function WhatsAppButton({
   size = "sm",
   onOpenDialog
 }: WhatsAppButtonProps) {
+  const { getNumeroWhatsAppPadrao } = useConfiguracoes();
+  
   const handleWhatsAppClick = () => {
     if (onOpenDialog && assistido) {
       onOpenDialog(assistido);
@@ -27,7 +30,7 @@ export default function WhatsAppButton({
     }
 
     // Para botão direto sem dialog, mostrar opções de método
-    const phoneToUse = phoneNumber && phoneNumber.trim() !== '' ? phoneNumber : '33999799138';
+    const phoneToUse = phoneNumber && phoneNumber.trim() !== '' ? phoneNumber : getNumeroWhatsAppPadrao();
     
     // Criar uma mensagem simples para o botão direto
     const message = `Olá ${assistidoNome}, tudo bem?`;

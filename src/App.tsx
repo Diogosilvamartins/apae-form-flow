@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { AppLayout } from "@/components/layout/AppLayout";
+import Configuracoes from "./pages/Configuracoes";
 import Dashboard from "./pages/Dashboard";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -41,6 +42,7 @@ const App = () => (
             <Route path="/perguntas" element={<AppLayout><Perguntas /></AppLayout>} />
             <Route path="/respostas" element={<AppLayout><Respostas /></AppLayout>} />
             <Route path="/historico" element={<AppLayout><Historico /></AppLayout>} />
+            <Route path="/configuracoes" element={<AppLayout><Configuracoes /></AppLayout>} />
             <Route path="/instrucoes" element={<AppLayout><Instructions /></AppLayout>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

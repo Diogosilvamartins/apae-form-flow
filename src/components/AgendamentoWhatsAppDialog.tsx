@@ -9,6 +9,7 @@ import { Agendamento } from "@/hooks/useAgendamentos";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import WhatsAppMethodDialog from "@/components/WhatsAppMethodDialog";
+import { useConfiguracoes } from "@/hooks/useConfiguracoes";
 
 interface AgendamentoWhatsAppDialogProps {
   open: boolean;
@@ -21,6 +22,8 @@ export default function AgendamentoWhatsAppDialog({
   onOpenChange,
   agendamento,
 }: AgendamentoWhatsAppDialogProps) {
+  const { getNumeroWhatsAppPadrao } = useConfiguracoes();
+  
   const formatDataHora = () => {
     const date = parseISO(agendamento.data_hora);
     return {
@@ -75,7 +78,7 @@ export default function AgendamentoWhatsAppDialog({
       return;
     }
 
-    const phoneToUse = agendamento.assistidos?.celular || '33999799138';
+    const phoneToUse = agendamento.assistidos?.celular || getNumeroWhatsAppPadrao();
     setMethodDialogOpen(true);
   };
 
@@ -124,7 +127,7 @@ export default function AgendamentoWhatsAppDialog({
           <DialogDescription>
             {data} às {hora} com {agendamento.profissionais?.nome}
             <br />
-            Celular: {agendamento.assistidos?.celular || "Usando número padrão APAE (33) 99979-9138"}
+            Celular: {agendamento.assistidos?.celular || `Usando número padrão APAE (${getNumeroWhatsAppPadrao()})`}
           </DialogDescription>
         </DialogHeader>
 
@@ -200,7 +203,7 @@ export default function AgendamentoWhatsAppDialog({
               onOpenChange(false);
             }
           }}
-          phoneNumber={agendamento.assistidos?.celular || '33999799138'}
+          phoneNumber={agendamento.assistidos?.celular || getNumeroWhatsAppPadrao()}
           message={message}
           contactName={agendamento.assistidos?.nome || 'Assistido'}
         />

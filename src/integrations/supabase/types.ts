@@ -145,6 +145,36 @@ export type Database = {
         }
         Relationships: []
       }
+      configuracoes: {
+        Row: {
+          chave: string
+          created_at: string
+          descricao: string | null
+          id: string
+          tipo: string | null
+          updated_at: string
+          valor: string | null
+        }
+        Insert: {
+          chave: string
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          tipo?: string | null
+          updated_at?: string
+          valor?: string | null
+        }
+        Update: {
+          chave?: string
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          tipo?: string | null
+          updated_at?: string
+          valor?: string | null
+        }
+        Relationships: []
+      }
       historico_respostas: {
         Row: {
           created_at: string
