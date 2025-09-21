@@ -1,40 +1,67 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Search, UserCheck } from "lucide-react";
-import { toast } from "sonner";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Plus, Search, UserCheck, Edit, Trash2 } from "lucide-react";
+import { useAssistidos, Assistido, CreateAssistidoData, UpdateAssistidoData } from "@/hooks/useAssistidos";
+import AssistidoDialog from "@/components/AssistidoDialog";
 
 export default function Assistidos() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingAssistido, setEditingAssistido] = useState<Assistido | undefined>();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [assistidoToDelete, setAssistidoToDelete] = useState<Assistido | undefined>();
 
-  const { data: assistidos, isLoading } = useQuery({
-    queryKey: ["assistidos"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("assistidos")
-        .select("*")
-        .order("created_at", { ascending: false });
+  const { assistidos, loading, createAssistido, updateAssistido, deleteAssistido } = useAssistidos();
 
-      if (error) {
-        console.error("Error fetching assistidos:", error);
-        toast.error("Erro ao carregar assistidos");
-        throw error;
-      }
-
-      return data;
-    }
-  });
-
-  const filteredAssistidos = assistidos?.filter(assistido =>
+  const filteredAssistidos = assistidos.filter(assistido =>
     assistido.nome.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
+  );
 
-  if (isLoading) {
+  const handleCreate = async (data: CreateAssistidoData) => {
+    await createAssistido(data);
+  };
+
+  const handleUpdate = async (data: UpdateAssistidoData) => {
+    if (editingAssistido) {
+      await updateAssistido(editingAssistido.id_assistido, data);
+      setEditingAssistido(undefined);
+    }
+  };
+
+  const handleEdit = (assistido: Assistido) => {
+    setEditingAssistido(assistido);
+    setDialogOpen(true);
+  };
+
+  const handleDeleteClick = (assistido: Assistido) => {
+    setAssistidoToDelete(assistido);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (assistidoToDelete) {
+      await deleteAssistido(assistidoToDelete.id_assistido);
+      setAssistidoToDelete(undefined);
+      setDeleteDialogOpen(false);
+    }
+  };
+
+  const handleNewAssistido = () => {
+    setEditingAssistido(undefined);
+    setDialogOpen(true);
+  };
+
+  const handleDialogClose = () => {
+    setDialogOpen(false);
+    setEditingAssistido(undefined);
+  };
+
+  if (loading) {
     return (
       <div className="container mx-auto py-6">
         <div className="animate-pulse space-y-4">
@@ -55,7 +82,7 @@ export default function Assistidos() {
           </h1>
           <p className="text-muted-foreground">Cadastro de pessoas assistidas</p>
         </div>
-        <Button className="flex items-center gap-2">
+        <Button onClick={handleNewAssistido} className="flex items-center gap-2">
           <Plus className="h-4 w-4" />
           Novo Assistido
         </Button>
@@ -109,9 +136,22 @@ export default function Assistidos() {
                       {new Date(assistido.created_at).toLocaleDateString('pt-BR')}
                     </TableCell>
                     <TableCell>
-                      <Button variant="ghost" size="sm">
-                        Editar
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEdit(assistido)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteClick(assistido)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -127,6 +167,32 @@ export default function Assistidos() {
           </div>
         </CardContent>
       </Card>
+
+      <AssistidoDialog
+        open={dialogOpen}
+        onOpenChange={handleDialogClose}
+        onSubmit={editingAssistido ? handleUpdate : handleCreate}
+        assistido={editingAssistido}
+        isEdit={!!editingAssistido}
+      />
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir o assistido "{assistidoToDelete?.nome}"? 
+              Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
