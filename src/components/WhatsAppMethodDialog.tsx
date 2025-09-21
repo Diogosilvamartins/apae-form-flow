@@ -63,12 +63,13 @@ export default function WhatsAppMethodDialog({
       icon: Smartphone,
       color: 'bg-blue-600 hover:bg-blue-700',
       action: () => {
-        console.log("📱 WhatsApp Direct - Mensagem original:", message);
-        console.log("📱 WhatsApp Direct - Número formatado:", formattedNumber);
+        console.log("📱 WhatsApp Direct (API) - Mensagem original:", message);
+        console.log("📱 WhatsApp Direct (API) - Número formatado:", formattedNumber);
         const encodedMessage = encodeURIComponent(message);
-        console.log("📱 WhatsApp Direct - Mensagem codificada:", encodedMessage);
-        const whatsappUrl = `https://wa.me/${formattedNumber}?text=${encodedMessage}`;
-        console.log("📱 WhatsApp Direct - URL final:", whatsappUrl);
+        console.log("📱 WhatsApp Direct (API) - Mensagem codificada:", encodedMessage);
+        // api.whatsapp.com é o endpoint mais confiável para pré-preencher o texto
+        const whatsappUrl = `https://api.whatsapp.com/send?phone=${formattedNumber}&text=${encodedMessage}&type=phone_number&app_absent=0`;
+        console.log("📱 WhatsApp Direct (API) - URL final:", whatsappUrl);
         window.open(whatsappUrl, '_blank');
         toast.success(`WhatsApp aberto para ${contactName}`);
         onOpenChange(false);
