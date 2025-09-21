@@ -20,14 +20,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   }
 
   if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center space-y-4">
-          <h1 className="text-2xl font-bold text-foreground">Sistema APAE</h1>
-          <p className="text-muted-foreground">Sistema de Gestão e Agendamentos</p>
-        </div>
-      </div>
-    );
+    return <Navigate to="/auth" replace />;
   }
 
   return (
