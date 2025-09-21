@@ -9,6 +9,7 @@ interface AuthContextType {
   loading: boolean;
   signIn: (email: string, senha: string) => Promise<{ error: string | null }>;
   signUp: (email: string, senha: string, nome: string, tipo: string) => Promise<{ error: string | null }>;
+  resendConfirmation: (email: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -23,7 +24,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -42,20 +43,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, senha: string) => {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password: senha,
-      });
-
+      const { error } = await supabase.auth.signInWithPassword({ email, password: senha });
       if (error) {
-        return { error: 'Email ou senha inválidos' };
+        const msg = error.message?.toLowerCase().includes('email not confirmed')
+          ? 'E-mail não confirmado. Clique em "Reenviar e-mail de confirmação".'
+          : 'Email ou senha inválidos';
+        return { error: msg };
       }
 
-      toast({
-        title: "Login realizado com sucesso",
-        description: `Bem-vindo!`,
-      });
-
+      toast({ title: "Login realizado com sucesso", description: `Bem-vindo!` });
       return { error: null };
     } catch (error) {
       console.error('Sign in error:', error);
@@ -65,14 +61,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (email: string, senha: string, nome: string, tipo: string) => {
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const redirectUrl = `${window.location.origin}/auth`;
+      const { error } = await supabase.auth.signUp({
         email,
         password: senha,
         options: {
-          data: {
-            nome: nome,
-            tipo_usuario: tipo,
-          }
+          data: { nome, tipo_usuario: tipo },
+          emailRedirectTo: redirectUrl,
         }
       });
 
@@ -81,14 +76,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       toast({
-        title: "Conta criada com sucesso",
-        description: "Você pode fazer login agora.",
+        title: "Conta criada",
+        description: "Enviamos um e-mail de confirmação. Verifique sua caixa de entrada.",
       });
 
       return { error: null };
     } catch (error) {
       console.error('Sign up error:', error);
       return { error: 'Erro interno do servidor' };
+    }
+  };
+
+  const resendConfirmation = async (email: string) => {
+    try {
+      const redirectUrl = `${window.location.origin}/auth`;
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email,
+        options: { emailRedirectTo: redirectUrl },
+      });
+      if (error) return { error: error.message };
+      toast({ title: "E-mail enviado", description: "Verifique sua caixa de entrada." });
+      return { error: null };
+    } catch (e) {
+      console.error('Resend confirmation error:', e);
+      return { error: 'Erro ao reenviar confirmação' };
     }
   };
 
@@ -101,9 +113,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         variant: "destructive",
       });
     } else {
-      toast({
-        title: "Logout realizado com sucesso",
-      });
+      toast({ title: "Logout realizado com sucesso" });
     }
   };
 
@@ -122,6 +132,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loading,
         signIn,
         signUp,
+        resendConfirmation,
         signOut,
       }}
     >

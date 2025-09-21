@@ -18,7 +18,7 @@ export default function Auth() {
     tipo: 'funcionario' 
   });
   const [loading, setLoading] = useState(false);
-  const { user, signIn, signUp } = useAuth();
+  const { user, signIn, signUp, resendConfirmation } = useAuth();
   const { toast } = useToast();
 
   if (user) {
@@ -153,22 +153,48 @@ export default function Auth() {
                     autoComplete="current-password"
                     minLength={6}
                   />
-                </div>
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <div className="flex items-center gap-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      Entrando...
-                    </div>
-                  ) : (
-                    'Entrar'
-                  )}
-                </Button>
-              </form>
+                  </div>
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      className="text-xs text-primary hover:underline"
+                      onClick={async () => {
+                        if (!loginData.email) {
+                          toast({
+                            title: "Informe o email",
+                            description: "Preencha o campo email para reenviar a confirmação.",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+                        setLoading(true);
+                        const { error } = await resendConfirmation(loginData.email);
+                        if (error) {
+                          toast({ title: "Falha ao reenviar", description: error, variant: "destructive" });
+                        } else {
+                          toast({ title: "Email reenviado", description: "Verifique sua caixa de entrada." });
+                        }
+                        setLoading(false);
+                      }}
+                    >
+                      Reenviar e-mail de confirmação
+                    </button>
+                  </div>
+                  <Button
+                    type="submit"
+                    className="w-full mt-2"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <div className="flex items-center gap-2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        Entrando...
+                      </div>
+                    ) : (
+                      'Entrar'
+                    )}
+                  </Button>
+                </form>
             </TabsContent>
 
             <TabsContent value="signup" className="space-y-4">
