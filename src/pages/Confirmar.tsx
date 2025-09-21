@@ -43,6 +43,8 @@ export default function Confirmar() {
 
   const buscarAgendamento = async () => {
     try {
+      console.log('Buscando agendamento com token:', token);
+      
       const { data, error } = await supabase
         .from('agendamentos')
         .select(`
@@ -55,10 +57,18 @@ export default function Confirmar() {
           profissionais:profissional_id(nome, especialidade)
         `)
         .eq('token_confirmacao', token)
-        .single();
+        .maybeSingle();
+
+      console.log('Resultado da consulta:', { data, error });
 
       if (error) {
         console.error('Erro ao buscar agendamento:', error);
+        toast.error("Erro ao buscar agendamento: " + error.message);
+        return;
+      }
+
+      if (!data) {
+        console.log('Agendamento não encontrado para token:', token);
         toast.error("Agendamento não encontrado ou link inválido");
         return;
       }
