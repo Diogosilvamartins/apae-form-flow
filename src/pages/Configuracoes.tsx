@@ -4,11 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Settings, Download, Upload, Smartphone, Building, MapPin, Save, Loader2 } from "lucide-react";
 import { useConfiguracoes } from "@/hooks/useConfiguracoes";
 import { useAgendamentos } from "@/hooks/useAgendamentos";
 import { useAssistidos } from "@/hooks/useAssistidos";
 import { useProfissionais } from "@/hooks/useProfissionais";
+import { formatCEP, validateCEP, fetchAddressByCEP } from "@/lib/validators";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -21,11 +23,47 @@ export default function Configuracoes() {
   
   const [saving, setSaving] = useState<string | null>(null);
   const [backupLoading, setBackupLoading] = useState(false);
+  const [loadingCEP, setLoadingCEP] = useState(false);
+  const [cepError, setCepError] = useState("");
+  
+  const estadosOptions = [
+    { value: "AC", label: "Acre" },
+    { value: "AL", label: "Alagoas" },
+    { value: "AP", label: "Amapá" },
+    { value: "AM", label: "Amazonas" },
+    { value: "BA", label: "Bahia" },
+    { value: "CE", label: "Ceará" },
+    { value: "DF", label: "Distrito Federal" },
+    { value: "ES", label: "Espírito Santo" },
+    { value: "GO", label: "Goiás" },
+    { value: "MA", label: "Maranhão" },
+    { value: "MT", label: "Mato Grosso" },
+    { value: "MS", label: "Mato Grosso do Sul" },
+    { value: "MG", label: "Minas Gerais" },
+    { value: "PA", label: "Pará" },
+    { value: "PB", label: "Paraíba" },
+    { value: "PR", label: "Paraná" },
+    { value: "PE", label: "Pernambuco" },
+    { value: "PI", label: "Piauí" },
+    { value: "RJ", label: "Rio de Janeiro" },
+    { value: "RN", label: "Rio Grande do Norte" },
+    { value: "RS", label: "Rio Grande do Sul" },
+    { value: "RO", label: "Rondônia" },
+    { value: "RR", label: "Roraima" },
+    { value: "SC", label: "Santa Catarina" },
+    { value: "SP", label: "São Paulo" },
+    { value: "SE", label: "Sergipe" },
+    { value: "TO", label: "Tocantins" },
+  ];
   
   const [formData, setFormData] = useState({
     numero_whatsapp_padrao: '',
     nome_instituicao: '',
-    endereco_instituicao: '',
+    endereco_logradouro: '',
+    endereco_numero: '',
+    endereco_cep: '',
+    endereco_cidade: '',
+    endereco_estado: '',
   });
 
   // Atualizar form quando configurações carregarem
@@ -34,7 +72,11 @@ export default function Configuracoes() {
       setFormData({
         numero_whatsapp_padrao: getConfiguracao('numero_whatsapp_padrao') || '',
         nome_instituicao: getConfiguracao('nome_instituicao') || '',
-        endereco_instituicao: getConfiguracao('endereco_instituicao') || '',
+        endereco_logradouro: getConfiguracao('endereco_logradouro') || '',
+        endereco_numero: getConfiguracao('endereco_numero') || '',
+        endereco_cep: getConfiguracao('endereco_cep') || '',
+        endereco_cidade: getConfiguracao('endereco_cidade') || '',
+        endereco_estado: getConfiguracao('endereco_estado') || '',
       });
     }
   }, [configuracoes, getConfiguracao]);
@@ -104,6 +146,49 @@ export default function Configuracoes() {
       ...prev,
       [chave]: valor
     }));
+  };
+
+  // Busca automática de endereço por CEP
+  const handleCEPChange = async (value: string) => {
+    const cleanValue = value.replace(/\D/g, '');
+    const formattedValue = formatCEP(cleanValue);
+    
+    handleInputChange('endereco_cep', formattedValue);
+    
+    if (cleanValue.length === 8) {
+      if (validateCEP(cleanValue)) {
+        setLoadingCEP(true);
+        setCepError("");
+        
+        try {
+          const addressData = await fetchAddressByCEP(cleanValue);
+          
+          if (addressData) {
+            setFormData(prev => ({
+              ...prev,
+              endereco_logradouro: addressData.logradouro,
+              endereco_cidade: addressData.localidade,
+              endereco_estado: addressData.uf
+            }));
+            toast.success("Endereço preenchido automaticamente! Informe o número.");
+          } else {
+            setCepError("CEP não encontrado");
+            toast.error("CEP não encontrado");
+          }
+        } catch (error) {
+          setCepError("Erro ao buscar CEP");
+          toast.error("Erro ao buscar CEP");
+        } finally {
+          setLoadingCEP(false);
+        }
+      } else {
+        setCepError("CEP inválido");
+      }
+    } else if (cleanValue.length > 0) {
+      setCepError("CEP deve conter 8 dígitos");
+    } else {
+      setCepError("");
+    }
   };
 
   if (loading) {
@@ -187,57 +272,180 @@ export default function Configuracoes() {
               Informações básicas da instituição
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="nome_instituicao">Nome da Instituição</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="nome_instituicao"
-                  value={formData.nome_instituicao}
-                  onChange={(e) => handleInputChange('nome_instituicao', e.target.value)}
-                  placeholder="APAE Governador Valadares"
-                  className="flex-1"
-                />
-                <Button 
-                  onClick={() => handleSave('nome_instituicao')}
-                  disabled={saving === 'nome_instituicao'}
-                  size="sm"
-                >
-                  {saving === 'nome_instituicao' ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Save className="h-4 w-4" />
-                  )}
-                  Salvar
-                </Button>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="nome_instituicao">Nome da Instituição</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="nome_instituicao"
+                    value={formData.nome_instituicao}
+                    onChange={(e) => handleInputChange('nome_instituicao', e.target.value)}
+                    placeholder="APAE Governador Valadares"
+                    className="flex-1"
+                  />
+                  <Button 
+                    onClick={() => handleSave('nome_instituicao')}
+                    disabled={saving === 'nome_instituicao'}
+                    size="sm"
+                  >
+                    {saving === 'nome_instituicao' ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Save className="h-4 w-4" />
+                    )}
+                    Salvar
+                  </Button>
+                </div>
               </div>
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="endereco_instituicao">Endereço</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="endereco_instituicao"
-                  value={formData.endereco_instituicao}
-                  onChange={(e) => handleInputChange('endereco_instituicao', e.target.value)}
-                  placeholder="Endereço da APAE"
-                  className="flex-1"
-                />
-                <Button 
-                  onClick={() => handleSave('endereco_instituicao')}
-                  disabled={saving === 'endereco_instituicao'}
-                  size="sm"
-                >
-                  {saving === 'endereco_instituicao' ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Save className="h-4 w-4" />
-                  )}
-                  Salvar
-                </Button>
+              <Separator />
+
+              <div className="space-y-4">
+                <Label className="text-base font-medium flex items-center gap-2">
+                  <MapPin className="h-4 w-4" />
+                  Endereço Completo
+                </Label>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="endereco_logradouro">Logradouro</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="endereco_logradouro"
+                      value={formData.endereco_logradouro}
+                      onChange={(e) => handleInputChange('endereco_logradouro', e.target.value)}
+                      placeholder="Rua, Avenida, etc."
+                      className="flex-1"
+                    />
+                    <Button 
+                      onClick={() => handleSave('endereco_logradouro')}
+                      disabled={saving === 'endereco_logradouro'}
+                      size="sm"
+                    >
+                      {saving === 'endereco_logradouro' ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Save className="h-4 w-4" />
+                      )}
+                      Salvar
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="endereco_numero">Número</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="endereco_numero"
+                        value={formData.endereco_numero}
+                        onChange={(e) => handleInputChange('endereco_numero', e.target.value)}
+                        placeholder="123"
+                        className="flex-1"
+                      />
+                      <Button 
+                        onClick={() => handleSave('endereco_numero')}
+                        disabled={saving === 'endereco_numero'}
+                        size="sm"
+                      >
+                        {saving === 'endereco_numero' ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Save className="h-4 w-4" />
+                        )}
+                        Salvar
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="endereco_cep">CEP</Label>
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <Input
+                          id="endereco_cep"
+                          value={formData.endereco_cep}
+                          onChange={(e) => handleCEPChange(e.target.value)}
+                          placeholder="00000-000"
+                          maxLength={9}
+                          className="flex-1"
+                        />
+                        {loadingCEP && (
+                          <Loader2 className="absolute right-3 top-3 h-4 w-4 animate-spin text-muted-foreground" />
+                        )}
+                      </div>
+                      <Button 
+                        onClick={() => handleSave('endereco_cep')}
+                        disabled={saving === 'endereco_cep'}
+                        size="sm"
+                      >
+                        {saving === 'endereco_cep' ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Save className="h-4 w-4" />
+                        )}
+                        Salvar
+                      </Button>
+                    </div>
+                    {cepError && <p className="text-sm text-destructive">{cepError}</p>}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="endereco_cidade">Cidade</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="endereco_cidade"
+                        value={formData.endereco_cidade}
+                        onChange={(e) => handleInputChange('endereco_cidade', e.target.value)}
+                        placeholder="Digite a cidade"
+                        className="flex-1"
+                      />
+                      <Button 
+                        onClick={() => handleSave('endereco_cidade')}
+                        disabled={saving === 'endereco_cidade'}
+                        size="sm"
+                      >
+                        {saving === 'endereco_cidade' ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Save className="h-4 w-4" />
+                        )}
+                        Salvar
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="endereco_estado">Estado</Label>
+                    <div className="flex gap-2">
+                      <Select value={formData.endereco_estado} onValueChange={(value) => handleInputChange('endereco_estado', value)}>
+                        <SelectTrigger className="flex-1">
+                          <SelectValue placeholder="Selecione" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {estadosOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Button 
+                        onClick={() => handleSave('endereco_estado')}
+                        disabled={saving === 'endereco_estado'}
+                        size="sm"
+                      >
+                        {saving === 'endereco_estado' ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Save className="h-4 w-4" />
+                        )}
+                        Salvar
+                      </Button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-          </CardContent>
         </Card>
 
         {/* Backup e Restauração */}
