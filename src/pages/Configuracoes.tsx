@@ -28,6 +28,7 @@ export default function Configuracoes() {
   const [restoreLoading, setRestoreLoading] = useState(false);
   const [loadingCEP, setLoadingCEP] = useState(false);
   const [cepError, setCepError] = useState("");
+  const [cepInput, setCepInput] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const estadosOptions = [
@@ -82,6 +83,7 @@ export default function Configuracoes() {
         endereco_cidade: getConfiguracao('endereco_cidade') || '',
         endereco_estado: getConfiguracao('endereco_estado') || '',
       });
+      setCepInput(getConfiguracao('endereco_cep') || '');
     }
   }, [configuracoes, getConfiguracao]);
 
@@ -103,7 +105,7 @@ export default function Configuracoes() {
       await Promise.all([
         updateConfiguracao('endereco_logradouro', formData.endereco_logradouro),
         updateConfiguracao('endereco_numero', formData.endereco_numero),
-        updateConfiguracao('endereco_cep', formData.endereco_cep),
+        updateConfiguracao('endereco_cep', cepInput),
         updateConfiguracao('endereco_cidade', formData.endereco_cidade),
         updateConfiguracao('endereco_estado', formData.endereco_estado),
       ]);
@@ -275,9 +277,7 @@ export default function Configuracoes() {
 
   // Busca automática de endereço por CEP
   const handleCEPInputChange = (value: string) => {
-    console.log('[CONFIG] CEP change:', value);
-    // Permite digitação livre (somente atualiza o estado)
-    handleInputChange('endereco_cep', value);
+    setCepInput(value);
     setCepError("");
   };
 
@@ -305,7 +305,7 @@ export default function Configuracoes() {
       const addressData = await fetchAddressByCEP(cleanValue);
       if (addressData) {
         // Formata e aplica os dados
-        handleInputChange('endereco_cep', formatCEP(cleanValue));
+        setCepInput(formatCEP(cleanValue));
         setFormData(prev => ({
           ...prev,
           endereco_logradouro: addressData.logradouro,
@@ -464,7 +464,8 @@ export default function Configuracoes() {
                     <div className="relative">
                       <Input
                         id="endereco_cep"
-                        value={formData.endereco_cep}
+                        type="text"
+                        value={cepInput}
                         onChange={(e) => handleCEPInputChange(e.target.value)}
                         onBlur={(e) => handleCEPBlur(e.target.value)}
                         placeholder="Digite o CEP"
