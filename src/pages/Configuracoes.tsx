@@ -168,41 +168,51 @@ export default function Configuracoes() {
   };
 
   // Busca automática de endereço por CEP
-  const handleCEPChange = async (value: string) => {
+  const handleCEPInputChange = (value: string) => {
+    // Permite digitação livre (somente atualiza o estado)
+    handleInputChange('endereco_cep', value);
+    setCepError("");
+  };
+
+  const handleCEPBlur = async (value: string) => {
     const cleanValue = value.replace(/\D/g, '');
-    const formattedValue = formatCEP(cleanValue);
-    
-    handleInputChange('endereco_cep', formattedValue);
-    
-    if (cleanValue.length === 8) {
-      if (validateCEP(cleanValue)) {
-        setLoadingCEP(true);
-        setCepError("");
-        
-        try {
-          const addressData = await fetchAddressByCEP(cleanValue);
-          
-          if (addressData) {
-            setFormData(prev => ({
-              ...prev,
-              endereco_logradouro: addressData.logradouro,
-              endereco_cidade: addressData.localidade,
-              endereco_estado: addressData.uf
-            }));
-            toast.success("Endereço preenchido automaticamente! Informe o número.");
-          } else {
-            setCepError("CEP não encontrado");
-          }
-        } catch (error) {
-          setCepError("Erro ao buscar CEP");
-        } finally {
-          setLoadingCEP(false);
-        }
-      } else {
-        setCepError("CEP inválido");
-      }
-    } else {
+
+    if (cleanValue.length === 0) {
       setCepError("");
+      return;
+    }
+
+    if (cleanValue.length !== 8) {
+      setCepError("CEP deve conter 8 dígitos");
+      return;
+    }
+
+    if (!validateCEP(cleanValue)) {
+      setCepError("CEP inválido");
+      return;
+    }
+
+    setLoadingCEP(true);
+
+    try {
+      const addressData = await fetchAddressByCEP(cleanValue);
+      if (addressData) {
+        // Formata e aplica os dados
+        handleInputChange('endereco_cep', formatCEP(cleanValue));
+        setFormData(prev => ({
+          ...prev,
+          endereco_logradouro: addressData.logradouro,
+          endereco_cidade: addressData.localidade,
+          endereco_estado: addressData.uf,
+        }));
+        toast.success("Endereço preenchido automaticamente! Informe o número.");
+      } else {
+        setCepError("CEP não encontrado");
+      }
+    } catch (error) {
+      setCepError("Erro ao buscar CEP");
+    } finally {
+      setLoadingCEP(false);
     }
   };
 
@@ -348,7 +358,8 @@ export default function Configuracoes() {
                       <Input
                         id="endereco_cep"
                         value={formData.endereco_cep}
-                        onChange={(e) => handleCEPChange(e.target.value)}
+                        onChange={(e) => handleCEPInputChange(e.target.value)}
+                        onBlur={(e) => handleCEPBlur(e.target.value)}
                         placeholder="Digite o CEP"
                         inputMode="numeric"
                         autoComplete="postal-code"
