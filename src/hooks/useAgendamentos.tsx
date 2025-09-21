@@ -61,6 +61,7 @@ export function useAgendamentos() {
   const fetchAgendamentos = async () => {
     try {
       setLoading(true);
+      console.log("🔍 Buscando agendamentos...");
       const { data, error } = await supabase
         .from("agendamentos")
         .select(`
@@ -71,11 +72,13 @@ export function useAgendamentos() {
         .order("data_hora", { ascending: true });
 
       if (error) {
-        console.error("Error fetching agendamentos:", error);
+        console.error("❌ Error fetching agendamentos:", error);
         toast.error("Erro ao carregar agendamentos");
         throw error;
       }
 
+      console.log("✅ Agendamentos retornados:", data?.length || 0);
+      console.log("📋 Dados dos agendamentos:", data);
       setAgendamentos(data || []);
     } catch (error) {
       console.error("Error in fetchAgendamentos:", error);

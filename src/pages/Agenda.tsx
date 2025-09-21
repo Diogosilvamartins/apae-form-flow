@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Calendar, Clock, User, Stethoscope, Edit, Trash2, MessageCircle, CheckCircle } from "lucide-react";
+import { Plus, Calendar, Clock, User, Stethoscope, Edit, Trash2, MessageCircle, CheckCircle, RefreshCw } from "lucide-react";
 import { useAgendamentos, Agendamento, CreateAgendamentoData, UpdateAgendamentoData, StatusAgendamento } from "@/hooks/useAgendamentos";
 import { format, parseISO, isToday, isTomorrow, addDays, startOfWeek, endOfWeek } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -115,6 +115,9 @@ export default function Agenda() {
   };
 
   const handleWhatsAppOpen = (agendamento: Agendamento) => {
+    console.log("📱 Abrindo WhatsApp para agendamento:", agendamento);
+    console.log("👤 Nome do assistido:", agendamento.assistidos?.nome);
+    console.log("📞 Celular:", agendamento.assistidos?.celular);
     setWhatsappAgendamento(agendamento);
     setWhatsappDialogOpen(true);
   };
@@ -156,7 +159,7 @@ export default function Agenda() {
             disabled={loading}
             className="flex items-center gap-2"
           >
-            <Clock className="h-4 w-4" />
+            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             {loading ? "Atualizando..." : "Atualizar"}
           </Button>
           <Button onClick={handleNewAgendamento} className="flex items-center gap-2">
