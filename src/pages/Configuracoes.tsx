@@ -349,8 +349,9 @@ export default function Configuracoes() {
                         id="endereco_cep"
                         value={formData.endereco_cep}
                         onChange={(e) => handleCEPChange(e.target.value)}
-                        placeholder="00000-000"
-                        maxLength={9}
+                        placeholder="Digite o CEP"
+                        inputMode="numeric"
+                        autoComplete="postal-code"
                       />
                       {loadingCEP && (
                         <Loader2 className="absolute right-3 top-3 h-4 w-4 animate-spin text-muted-foreground" />
