@@ -24,6 +24,7 @@ export default function AssistidoDialog({
   const [formData, setFormData] = useState({
     nome: "",
     data_nascimento: "",
+    celular: "",
     observacoes: "",
   });
   const [loading, setLoading] = useState(false);
@@ -33,12 +34,14 @@ export default function AssistidoDialog({
       setFormData({
         nome: assistido.nome || "",
         data_nascimento: assistido.data_nascimento || "",
+        celular: assistido.celular || "",
         observacoes: assistido.observacoes || "",
       });
     } else {
       setFormData({
         nome: "",
         data_nascimento: "",
+        celular: "",
         observacoes: "",
       });
     }
@@ -56,6 +59,7 @@ export default function AssistidoDialog({
       const submitData: CreateAssistidoData | UpdateAssistidoData = {
         nome: formData.nome.trim(),
         data_nascimento: formData.data_nascimento || undefined,
+        celular: formData.celular.trim() || undefined,
         observacoes: formData.observacoes.trim() || undefined,
       };
 
@@ -102,6 +106,16 @@ export default function AssistidoDialog({
               type="date"
               value={formData.data_nascimento}
               onChange={(e) => handleInputChange("data_nascimento", e.target.value)}
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="celular">Celular</Label>
+            <Input
+              id="celular"
+              value={formData.celular}
+              onChange={(e) => handleInputChange("celular", e.target.value)}
+              placeholder="(XX) XXXXX-XXXX"
             />
           </div>
           

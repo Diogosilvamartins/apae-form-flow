@@ -17,6 +17,7 @@ export type Database = {
       assistidos: {
         Row: {
           ativo: boolean
+          celular: string | null
           created_at: string
           data_nascimento: string | null
           id_assistido: string
@@ -27,6 +28,7 @@ export type Database = {
         }
         Insert: {
           ativo?: boolean
+          celular?: string | null
           created_at?: string
           data_nascimento?: string | null
           id_assistido?: string
@@ -37,6 +39,7 @@ export type Database = {
         }
         Update: {
           ativo?: boolean
+          celular?: string | null
           created_at?: string
           data_nascimento?: string | null
           id_assistido?: string

@@ -6,6 +6,7 @@ export interface Assistido {
   id_assistido: string;
   nome: string;
   data_nascimento?: string;
+  celular?: string;
   observacoes?: string;
   responsavel_id?: string;
   ativo: boolean;
@@ -16,6 +17,7 @@ export interface Assistido {
 export interface CreateAssistidoData {
   nome: string;
   data_nascimento?: string;
+  celular?: string;
   observacoes?: string;
   responsavel_id?: string;
 }
@@ -23,6 +25,7 @@ export interface CreateAssistidoData {
 export interface UpdateAssistidoData {
   nome?: string;
   data_nascimento?: string;
+  celular?: string;
   observacoes?: string;
   responsavel_id?: string;
   ativo?: boolean;

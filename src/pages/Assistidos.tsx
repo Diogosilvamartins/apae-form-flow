@@ -5,9 +5,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Plus, Search, UserCheck, Edit, Trash2 } from "lucide-react";
+import { Plus, Search, UserCheck, Edit, Trash2, MessageSquare } from "lucide-react";
 import { useAssistidos, Assistido, CreateAssistidoData, UpdateAssistidoData } from "@/hooks/useAssistidos";
 import AssistidoDialog from "@/components/AssistidoDialog";
+import WhatsAppButton from "@/components/WhatsAppButton";
+import WhatsAppDialog from "@/components/WhatsAppDialog";
+import WhatsAppBulk from "@/components/WhatsAppBulk";
 
 export default function Assistidos() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -15,6 +18,9 @@ export default function Assistidos() {
   const [editingAssistido, setEditingAssistido] = useState<Assistido | undefined>();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [assistidoToDelete, setAssistidoToDelete] = useState<Assistido | undefined>();
+  const [whatsappDialogOpen, setWhatsappDialogOpen] = useState(false);
+  const [whatsappAssistido, setWhatsappAssistido] = useState<Assistido | undefined>();
+  const [whatsappBulkOpen, setWhatsappBulkOpen] = useState(false);
 
   const { assistidos, loading, createAssistido, updateAssistido, deleteAssistido } = useAssistidos();
 
@@ -61,6 +67,11 @@ export default function Assistidos() {
     setEditingAssistido(undefined);
   };
 
+  const handleWhatsAppOpen = (assistido: Assistido) => {
+    setWhatsappAssistido(assistido);
+    setWhatsappDialogOpen(true);
+  };
+
   if (loading) {
     return (
       <div className="container mx-auto py-6">
@@ -82,10 +93,20 @@ export default function Assistidos() {
           </h1>
           <p className="text-muted-foreground">Cadastro de pessoas assistidas</p>
         </div>
-        <Button onClick={handleNewAssistido} className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
-          Novo Assistido
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button onClick={handleNewAssistido} className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Novo Assistido
+          </Button>
+          <Button
+            onClick={() => setWhatsappBulkOpen(true)}
+            variant="outline"
+            className="flex items-center gap-2 text-green-600 hover:text-green-700 hover:bg-green-50"
+          >
+            <MessageSquare className="h-4 w-4" />
+            WhatsApp em Massa
+          </Button>
+        </div>
       </div>
 
       <Card>
@@ -111,6 +132,7 @@ export default function Assistidos() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Nome</TableHead>
+                  <TableHead>Celular</TableHead>
                   <TableHead>Data de Nascimento</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Data de Cadastro</TableHead>
@@ -121,6 +143,9 @@ export default function Assistidos() {
                 {filteredAssistidos.map((assistido) => (
                   <TableRow key={assistido.id_assistido}>
                     <TableCell className="font-medium">{assistido.nome}</TableCell>
+                    <TableCell>
+                      {assistido.celular || '-'}
+                    </TableCell>
                     <TableCell>
                       {assistido.data_nascimento 
                         ? new Date(assistido.data_nascimento).toLocaleDateString('pt-BR')
@@ -137,6 +162,12 @@ export default function Assistidos() {
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2">
+                        <WhatsAppButton 
+                          phoneNumber={assistido.celular}
+                          assistidoNome={assistido.nome}
+                          assistido={assistido}
+                          onOpenDialog={handleWhatsAppOpen}
+                        />
                         <Button
                           variant="ghost"
                           size="sm"
@@ -157,7 +188,7 @@ export default function Assistidos() {
                 ))}
                 {filteredAssistidos.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">
+                    <TableCell colSpan={6} className="text-center py-6 text-muted-foreground">
                       Nenhum assistido encontrado.
                     </TableCell>
                   </TableRow>
@@ -174,6 +205,20 @@ export default function Assistidos() {
         onSubmit={editingAssistido ? handleUpdate : handleCreate}
         assistido={editingAssistido}
         isEdit={!!editingAssistido}
+      />
+
+      {whatsappAssistido && (
+        <WhatsAppDialog
+          open={whatsappDialogOpen}
+          onOpenChange={setWhatsappDialogOpen}
+          assistido={whatsappAssistido}
+        />
+      )}
+
+      <WhatsAppBulk
+        open={whatsappBulkOpen}
+        onOpenChange={setWhatsappBulkOpen}
+        assistidos={assistidos}
       />
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
