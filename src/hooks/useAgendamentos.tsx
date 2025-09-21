@@ -178,6 +178,28 @@ export function useAgendamentos() {
 
   useEffect(() => {
     fetchAgendamentos();
+
+    // Configurar real-time subscription para agendamentos
+    const channel = supabase
+      .channel('agendamentos-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'agendamentos'
+        },
+        (payload) => {
+          console.log('Agendamento atualizado via realtime:', payload);
+          // Recarregar dados quando houver mudanças
+          fetchAgendamentos();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   return {
