@@ -2,11 +2,12 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Calendar, Clock, User, Stethoscope, Edit, Trash2 } from "lucide-react";
+import { Plus, Calendar, Clock, User, Stethoscope, Edit, Trash2, MessageCircle } from "lucide-react";
 import { useAgendamentos, Agendamento, CreateAgendamentoData, UpdateAgendamentoData, StatusAgendamento } from "@/hooks/useAgendamentos";
 import { format, parseISO, isToday, isTomorrow, addDays, startOfWeek, endOfWeek } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import AgendamentoDialog from "@/components/AgendamentoDialog";
+import AgendamentoWhatsAppDialog from "@/components/AgendamentoWhatsAppDialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 export default function Agenda() {
@@ -14,6 +15,8 @@ export default function Agenda() {
   const [editingAgendamento, setEditingAgendamento] = useState<Agendamento | undefined>();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [agendamentoToDelete, setAgendamentoToDelete] = useState<Agendamento | undefined>();
+  const [whatsappDialogOpen, setWhatsappDialogOpen] = useState(false);
+  const [whatsappAgendamento, setWhatsappAgendamento] = useState<Agendamento | undefined>();
   const [viewMode, setViewMode] = useState<'hoje' | 'semana' | 'mes'>('hoje');
 
   const { agendamentos, loading, createAgendamento, updateAgendamento, deleteAgendamento } = useAgendamentos();
@@ -109,6 +112,11 @@ export default function Agenda() {
   const handleDialogClose = () => {
     setDialogOpen(false);
     setEditingAgendamento(undefined);
+  };
+
+  const handleWhatsAppOpen = (agendamento: Agendamento) => {
+    setWhatsappAgendamento(agendamento);
+    setWhatsappDialogOpen(true);
   };
 
   const formatDataHora = (dataHora: string) => {
@@ -236,6 +244,15 @@ export default function Agenda() {
                         <Button
                           variant="ghost"
                           size="sm"
+                          onClick={() => handleWhatsAppOpen(agendamento)}
+                          className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                          title="Enviar lembrete por WhatsApp"
+                        >
+                          <MessageCircle className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={() => handleEdit(agendamento)}
                         >
                           <Edit className="h-4 w-4" />
@@ -264,6 +281,14 @@ export default function Agenda() {
         agendamento={editingAgendamento}
         isEdit={!!editingAgendamento}
       />
+
+      {whatsappAgendamento && (
+        <AgendamentoWhatsAppDialog
+          open={whatsappDialogOpen}
+          onOpenChange={setWhatsappDialogOpen}
+          agendamento={whatsappAgendamento}
+        />
+      )}
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
