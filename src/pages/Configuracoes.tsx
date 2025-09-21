@@ -277,6 +277,7 @@ export default function Configuracoes() {
 
   // Busca automática de endereço por CEP
   const handleCEPInputChange = (value: string) => {
+    console.log('[CONFIG] CEP onChange value:', value);
     setCepInput(value);
     setCepError("");
   };
@@ -468,6 +469,7 @@ export default function Configuracoes() {
                         value={cepInput}
                         onChange={(e) => handleCEPInputChange(e.target.value)}
                         onBlur={(e) => handleCEPBlur(e.target.value)}
+                        onFocus={() => console.log('[CONFIG] CEP focus')}
                         placeholder="Digite o CEP"
                         inputMode="numeric"
                         autoComplete="postal-code"
