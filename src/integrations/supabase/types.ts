@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      agendamentos: {
+        Row: {
+          assistido_id: string
+          created_at: string
+          criado_por: string
+          data_hora: string
+          duracao_minutos: number
+          id_agendamento: string
+          observacoes: string | null
+          profissional_id: string
+          status: Database["public"]["Enums"]["status_agendamento"]
+          updated_at: string
+        }
+        Insert: {
+          assistido_id: string
+          created_at?: string
+          criado_por: string
+          data_hora: string
+          duracao_minutos?: number
+          id_agendamento?: string
+          observacoes?: string | null
+          profissional_id: string
+          status?: Database["public"]["Enums"]["status_agendamento"]
+          updated_at?: string
+        }
+        Update: {
+          assistido_id?: string
+          created_at?: string
+          criado_por?: string
+          data_hora?: string
+          duracao_minutos?: number
+          id_agendamento?: string
+          observacoes?: string | null
+          profissional_id?: string
+          status?: Database["public"]["Enums"]["status_agendamento"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agendamentos_assistido_id_fkey"
+            columns: ["assistido_id"]
+            isOneToOne: false
+            referencedRelation: "assistidos"
+            referencedColumns: ["id_assistido"]
+          },
+          {
+            foreignKeyName: "agendamentos_profissional_id_fkey"
+            columns: ["profissional_id"]
+            isOneToOne: false
+            referencedRelation: "profissionais"
+            referencedColumns: ["id_profissional"]
+          },
+        ]
+      }
       assistidos: {
         Row: {
           ativo: boolean
@@ -216,6 +270,45 @@ export type Database = {
           },
         ]
       }
+      profissionais: {
+        Row: {
+          ativo: boolean
+          celular: string | null
+          created_at: string
+          email: string | null
+          especialidade: Database["public"]["Enums"]["especialidade_profissional"]
+          id_profissional: string
+          nome: string
+          observacoes: string | null
+          registro_profissional: string | null
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          celular?: string | null
+          created_at?: string
+          email?: string | null
+          especialidade: Database["public"]["Enums"]["especialidade_profissional"]
+          id_profissional?: string
+          nome: string
+          observacoes?: string | null
+          registro_profissional?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          celular?: string | null
+          created_at?: string
+          email?: string | null
+          especialidade?: Database["public"]["Enums"]["especialidade_profissional"]
+          id_profissional?: string
+          nome?: string
+          observacoes?: string | null
+          registro_profissional?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       respostas: {
         Row: {
           assistido_id: string
@@ -312,6 +405,23 @@ export type Database = {
       }
     }
     Enums: {
+      especialidade_profissional:
+        | "psicologo"
+        | "assistente_social"
+        | "fonoaudiologo"
+        | "fisioterapeuta"
+        | "terapeuta_ocupacional"
+        | "pedagogo"
+        | "nutricionista"
+        | "medico"
+        | "outro"
+      status_agendamento:
+        | "agendado"
+        | "confirmado"
+        | "em_andamento"
+        | "concluido"
+        | "cancelado"
+        | "reagendado"
       tipo_pergunta: "multipla_escolha" | "texto_livre" | "escala" | "sim_nao"
       tipo_usuario:
         | "administrador"
@@ -445,6 +555,25 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      especialidade_profissional: [
+        "psicologo",
+        "assistente_social",
+        "fonoaudiologo",
+        "fisioterapeuta",
+        "terapeuta_ocupacional",
+        "pedagogo",
+        "nutricionista",
+        "medico",
+        "outro",
+      ],
+      status_agendamento: [
+        "agendado",
+        "confirmado",
+        "em_andamento",
+        "concluido",
+        "cancelado",
+        "reagendado",
+      ],
       tipo_pergunta: ["multipla_escolha", "texto_livre", "escala", "sim_nao"],
       tipo_usuario: [
         "administrador",

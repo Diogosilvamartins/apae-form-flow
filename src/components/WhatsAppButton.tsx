@@ -21,17 +21,14 @@ export default function WhatsAppButton({
   onOpenDialog
 }: WhatsAppButtonProps) {
   const handleWhatsAppClick = () => {
-    if (!phoneNumber || phoneNumber.trim() === '') {
-      toast.error("Número de celular não cadastrado para este assistido");
-      return;
-    }
-
     if (onOpenDialog && assistido) {
       onOpenDialog(assistido);
       return;
     }
 
-    // Fallback para abrir direto (compatibilidade)
+    // Usar número padrão se não tiver celular cadastrado
+    const phoneToUse = phoneNumber && phoneNumber.trim() !== '' ? phoneNumber : '33984043348';
+    
     const formatPhoneNumber = (phone: string) => {
       const cleaned = phone.replace(/\D/g, '');
       
@@ -43,10 +40,10 @@ export default function WhatsAppButton({
         return cleaned;
       }
       
-      return cleaned;
+      return `55${cleaned}`;
     };
 
-    const formattedNumber = formatPhoneNumber(phoneNumber);
+    const formattedNumber = formatPhoneNumber(phoneToUse);
     const message = encodeURIComponent(`Olá ${assistidoNome}, tudo bem?`);
     const whatsappUrl = `https://wa.me/${formattedNumber}?text=${message}`;
     

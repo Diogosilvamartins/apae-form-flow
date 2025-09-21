@@ -24,7 +24,10 @@ export default function WhatsAppDialog({
   const [sending, setSending] = useState(false);
 
   const formatPhoneNumber = (phone: string | undefined) => {
-    if (!phone) return null;
+    // Se não tem número, usar o número padrão da APAE
+    if (!phone || phone.trim() === '') {
+      return '5533984043348';
+    }
     
     const cleaned = phone.replace(/\D/g, '');
     
@@ -36,30 +39,20 @@ export default function WhatsAppDialog({
       return cleaned;
     }
     
-    return cleaned.length >= 10 ? cleaned : null;
+    return cleaned.length >= 10 ? cleaned : '5533984043348';
   };
 
   const handleSendWhatsApp = async () => {
-    if (!assistido.celular || assistido.celular.trim() === '') {
-      toast.error("Número de celular não cadastrado para este assistido");
-      return;
-    }
-
-    const formattedNumber = formatPhoneNumber(assistido.celular);
-    
-    if (!formattedNumber) {
-      toast.error("Número de celular inválido");
-      return;
-    }
-
-    if (!message.trim()) {
-      toast.error("Digite uma mensagem para enviar");
-      return;
-    }
-
     setSending(true);
     
     try {
+      const formattedNumber = formatPhoneNumber(assistido.celular);
+      
+      if (!message.trim()) {
+        toast.error("Digite uma mensagem para enviar");
+        return;
+      }
+
       const encodedMessage = encodeURIComponent(message);
       const whatsappUrl = `https://wa.me/${formattedNumber}?text=${encodedMessage}`;
       
@@ -97,7 +90,7 @@ export default function WhatsAppDialog({
             Enviar WhatsApp para {assistido.nome}
           </DialogTitle>
           <DialogDescription>
-            Celular: {assistido.celular || "Não cadastrado"}
+            Celular: {assistido.celular || "Usando número padrão APAE (33) 98404-3348"}
           </DialogDescription>
         </DialogHeader>
 
@@ -151,7 +144,7 @@ export default function WhatsAppDialog({
           </Button>
           <Button
             onClick={handleSendWhatsApp}
-            disabled={sending || !assistido.celular}
+            disabled={sending}
             className="bg-green-600 hover:bg-green-700"
           >
             {sending ? (

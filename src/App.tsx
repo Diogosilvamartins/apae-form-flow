@@ -9,6 +9,8 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Usuarios from "./pages/Usuarios";
 import Assistidos from "./pages/Assistidos";
+import Profissionais from "./pages/Profissionais";
+import Agenda from "./pages/Agenda";
 import Categorias from "./pages/Categorias";
 import Perguntas from "./pages/Perguntas";
 import Respostas from "./pages/Respostas";
@@ -30,6 +32,8 @@ const App = () => (
             <Route path="/" element={<AppLayout><Index /></AppLayout>} />
             <Route path="/usuarios" element={<AppLayout><Usuarios /></AppLayout>} />
             <Route path="/assistidos" element={<AppLayout><Assistidos /></AppLayout>} />
+            <Route path="/profissionais" element={<AppLayout><Profissionais /></AppLayout>} />
+            <Route path="/agenda" element={<AppLayout><Agenda /></AppLayout>} />
             <Route path="/categorias" element={<AppLayout><Categorias /></AppLayout>} />
             <Route path="/perguntas" element={<AppLayout><Perguntas /></AppLayout>} />
             <Route path="/respostas" element={<AppLayout><Respostas /></AppLayout>} />
