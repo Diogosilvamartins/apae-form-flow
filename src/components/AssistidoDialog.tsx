@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,9 +8,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Camera, Loader2 } from "lucide-react";
+import { Camera, Loader2, Upload, X } from "lucide-react";
 import { Assistido, CreateAssistidoData, UpdateAssistidoData } from "@/hooks/useAssistidos";
 import { validateCPF, formatCPF, formatCEP, validateCEP, fetchAddressByCEP } from "@/lib/validators";
+import { useFileUpload } from "@/hooks/useFileUpload";
+import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
 interface AssistidoDialogProps {
@@ -124,6 +126,9 @@ export default function AssistidoDialog({
   const [cpfError, setCpfError] = useState("");
   const [cpfResponsavelError, setCpfResponsavelError] = useState("");
   const [cepError, setCepError] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { uploading, uploadFile, deleteFile } = useFileUpload();
+  const { user } = useAuth();
 
   useEffect(() => {
     if (isEdit && assistido) {
@@ -275,6 +280,68 @@ export default function AssistidoDialog({
     }
   };
 
+  // Upload de imagem
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !user) {
+      return;
+    }
+
+    // Validar tipo de arquivo
+    if (!file.type.startsWith('image/')) {
+      toast.error('Por favor, selecione apenas arquivos de imagem');
+      return;
+    }
+
+    // Validar tamanho (máx 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('A imagem deve ter no máximo 5MB');
+      return;
+    }
+
+    try {
+      // Deletar imagem anterior se existir
+      if (formData.foto_url) {
+        const oldPath = formData.foto_url.split('/').pop();
+        if (oldPath) {
+          await deleteFile('assistido-photos', `${user.id}/${oldPath}`);
+        }
+      }
+
+      // Upload nova imagem
+      const fileName = `${Date.now()}_${file.name}`;
+      const filePath = `${user.id}/${fileName}`;
+      
+      const publicUrl = await uploadFile(file, 'assistido-photos', filePath);
+      
+      if (publicUrl) {
+        setFormData(prev => ({ ...prev, foto_url: publicUrl }));
+      }
+    } catch (error) {
+      console.error('Erro no upload:', error);
+    }
+  };
+
+  const handleRemoveImage = async () => {
+    if (formData.foto_url && user) {
+      try {
+        const fileName = formData.foto_url.split('/').pop();
+        if (fileName) {
+          await deleteFile('assistido-photos', `${user.id}/${fileName}`);
+        }
+        setFormData(prev => ({ ...prev, foto_url: "" }));
+        toast.success('Imagem removida com sucesso');
+      } catch (error) {
+        console.error('Erro ao remover imagem:', error);
+        toast.error('Erro ao remover imagem');
+      }
+    }
+  };
+
+  const handleImageClick = () => {
+    fileInputRef.current?.click();
+  };
+
   // Busca automática de endereço por CEP
   const handleCEPChange = async (value: string) => {
     const cleanValue = value.replace(/\D/g, '');
@@ -334,16 +401,51 @@ export default function AssistidoDialog({
         
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="flex items-center space-x-4 mb-6">
-            <Avatar className="w-20 h-20">
-              <AvatarImage src={formData.foto_url} alt={formData.nome} />
-              <AvatarFallback className="text-lg bg-secondary">
-                {formData.nome ? formData.nome.charAt(0).toUpperCase() : "?"}
-              </AvatarFallback>
-            </Avatar>
-            <Button type="button" variant="outline" className="flex items-center gap-2">
-              <Camera className="w-4 h-4" />
-              Alterar Imagem
-            </Button>
+            <div className="relative">
+              <Avatar className="w-20 h-20 cursor-pointer" onClick={handleImageClick}>
+                <AvatarImage src={formData.foto_url} alt={formData.nome} />
+                <AvatarFallback className="text-lg bg-secondary">
+                  {formData.nome ? formData.nome.charAt(0).toUpperCase() : "?"}
+                </AvatarFallback>
+              </Avatar>
+              {formData.foto_url && (
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
+                  onClick={handleRemoveImage}
+                >
+                  <X className="w-3 h-3" />
+                </Button>
+              )}
+            </div>
+            <div className="flex flex-col gap-2">
+              <Button 
+                type="button" 
+                variant="outline" 
+                className="flex items-center gap-2"
+                onClick={handleImageClick}
+                disabled={uploading}
+              >
+                {uploading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Camera className="w-4 h-4" />
+                )}
+                {uploading ? "Carregando..." : "Alterar Imagem"}
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+              <p className="text-xs text-muted-foreground">
+                Clique na imagem ou no botão para alterar
+              </p>
+            </div>
           </div>
 
           <Tabs defaultValue="dados-pessoais" className="w-full">
