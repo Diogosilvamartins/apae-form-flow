@@ -13,7 +13,7 @@ import { LogOut, User } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 export function AppHeader() {
-  const { usuario, signOut } = useAuth();
+  const { user, signOut } = useAuth();
 
   const getInitials = (name: string) => {
     return name
@@ -49,7 +49,7 @@ export function AppHeader() {
             <Button variant="ghost" className="relative h-10 w-10 rounded-full">
               <Avatar className="h-10 w-10">
                 <AvatarFallback className="bg-primary text-primary-foreground">
-                  {usuario?.nome ? getInitials(usuario.nome) : 'U'}
+                  {user?.user_metadata?.nome ? getInitials(user.user_metadata.nome) : 'U'}
                 </AvatarFallback>
               </Avatar>
             </Button>
@@ -57,10 +57,10 @@ export function AppHeader() {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium">{usuario?.nome}</p>
-                <p className="text-xs text-muted-foreground">{usuario?.email}</p>
+                <p className="text-sm font-medium">{user?.user_metadata?.nome || user?.email}</p>
+                <p className="text-xs text-muted-foreground">{user?.email}</p>
                 <p className="text-xs text-muted-foreground">
-                  {usuario?.tipo_usuario ? getTipoUsuarioLabel(usuario.tipo_usuario) : ''}
+                  {user?.user_metadata?.tipo_usuario ? getTipoUsuarioLabel(user.user_metadata.tipo_usuario) : ''}
                 </p>
               </div>
             </DropdownMenuLabel>

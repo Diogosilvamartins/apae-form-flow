@@ -45,9 +45,9 @@ export default function Usuarios() {
   });
 
   const { usuarios, loading, createUsuario, updateUsuario, deleteUsuario } = useUsuarios();
-  const { usuario: currentUser } = useAuth();
+  const { user: currentUser } = useAuth();
 
-  const isAdmin = currentUser?.tipo_usuario === 'admin';
+  const isAdmin = currentUser?.user_metadata?.tipo_usuario === 'admin';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

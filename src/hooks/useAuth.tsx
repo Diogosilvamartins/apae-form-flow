@@ -2,25 +2,20 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import type { Tables } from '@/integrations/supabase/types';
-
-type Usuario = Tables<'usuarios'>;
 
 interface AuthContextType {
   user: User | null;
-  usuario: Usuario | null;
   session: Session | null;
   loading: boolean;
   signIn: (email: string, senha: string) => Promise<{ error: string | null }>;
+  signUp: (email: string, senha: string, nome: string, tipo: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
-  createTestUsers: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -31,31 +26,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          // Fetch usuario data when user is authenticated
-          setTimeout(async () => {
-            try {
-              const { data, error } = await supabase
-                .from('usuarios')
-                .select('*')
-                .eq('id_usuario', session.user.id)
-                .maybeSingle();
-
-              if (error) {
-                console.error('Error fetching usuario:', error);
-                return;
-              }
-
-              setUsuario(data);
-            } catch (error) {
-              console.error('Error in usuario fetch:', error);
-            }
-          }, 0);
-        } else {
-          setUsuario(null);
-        }
-        
         setLoading(false);
       }
     );
@@ -93,6 +63,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const signUp = async (email: string, senha: string, nome: string, tipo: string) => {
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password: senha,
+        options: {
+          data: {
+            nome: nome,
+            tipo_usuario: tipo,
+          }
+        }
+      });
+
+      if (error) {
+        return { error: error.message };
+      }
+
+      toast({
+        title: "Conta criada com sucesso",
+        description: "Você pode fazer login agora.",
+      });
+
+      return { error: null };
+    } catch (error) {
+      console.error('Sign up error:', error);
+      return { error: 'Erro interno do servidor' };
+    }
+  };
+
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -108,42 +107,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const createTestUsers = async () => {
-    try {
-      const { data, error } = await supabase.functions.invoke('create-test-users', {
-        body: {},
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      toast({
-        title: "Usuários de teste criados",
-        description: "Agora você pode fazer login com as credenciais de teste.",
-      });
-
-      console.log('Resultado da criação de usuários:', data);
-    } catch (error) {
-      console.error('Erro ao criar usuários de teste:', error);
-      toast({
-        title: "Erro ao criar usuários",
-        description: "Verifique o console para mais detalhes.",
-        variant: "destructive",
-      });
-    }
-  };
+  // Enhance user with metadata
+  const enhancedUser = user ? {
+    ...user,
+    nome: user.user_metadata?.nome || user.email?.split('@')[0] || 'Usuário',
+    tipo_usuario: user.user_metadata?.tipo_usuario || 'funcionario',
+  } as any : null;
 
   return (
     <AuthContext.Provider
       value={{
-        user,
-        usuario,
+        user: enhancedUser,
         session,
         loading,
         signIn,
+        signUp,
         signOut,
-        createTestUsers,
       }}
     >
       {children}

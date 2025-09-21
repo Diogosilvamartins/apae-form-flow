@@ -3,7 +3,7 @@ import { Users, UserCheck, FolderOpen, HelpCircle, MessageSquare, History } from
 import { useAuth } from "@/hooks/useAuth";
 
 const Index = () => {
-  const { usuario } = useAuth();
+  const { user } = useAuth();
 
   const stats = [
     {
@@ -57,8 +57,8 @@ const Index = () => {
   ];
 
   const hasAccess = (roles: string[]) => {
-    if (!usuario?.tipo_usuario) return false;
-    return roles.includes(usuario.tipo_usuario);
+    if (!user?.user_metadata?.tipo_usuario) return false;
+    return roles.includes(user.user_metadata.tipo_usuario);
   };
 
   const visibleStats = stats.filter(stat => hasAccess(stat.roles));
@@ -77,10 +77,10 @@ const Index = () => {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground">
-          Bem-vindo ao Sistema APAE, {usuario?.nome}
+          Bem-vindo ao Sistema APAE, {user?.user_metadata?.nome || user?.email}
         </p>
         <p className="text-sm text-muted-foreground">
-          Perfil: {usuario?.tipo_usuario ? getTipoUsuarioLabel(usuario.tipo_usuario) : ''}
+          Perfil: {user?.user_metadata?.tipo_usuario ? getTipoUsuarioLabel(user.user_metadata.tipo_usuario) : ''}
         </p>
       </div>
 

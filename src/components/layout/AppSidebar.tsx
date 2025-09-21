@@ -27,14 +27,14 @@ const menuItems = [
 export function AppSidebar() {
   const { state } = useSidebar();
   const location = useLocation();
-  const { usuario } = useAuth();
+  const { user } = useAuth();
   const currentPath = location.pathname;
   const collapsed = state === "collapsed";
 
   const isActive = (path: string) => currentPath === path;
   const hasAccess = (roles: string[]) => {
-    if (!usuario?.tipo_usuario) return false;
-    return roles.includes(usuario.tipo_usuario);
+    if (!user?.user_metadata?.tipo_usuario) return false;
+    return roles.includes(user.user_metadata.tipo_usuario);
   };
 
   const visibleItems = menuItems.filter(item => hasAccess(item.roles));
