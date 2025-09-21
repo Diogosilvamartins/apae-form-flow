@@ -71,30 +71,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, senha: string) => {
     try {
-      // First, find the usuario by email to get the hash
-      const { data: usuarioData, error: usuarioError } = await supabase
-        .from('usuarios')
-        .select('*')
-        .eq('email', email)
-        .single();
-
-      if (usuarioError || !usuarioData) {
-        return { error: 'Usuário ou senha inválidos' };
-      }
-
-      // Use Supabase Auth with the email and password
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password: senha,
       });
 
       if (error) {
-        return { error: 'Usuário ou senha inválidos' };
+        return { error: 'Email ou senha inválidos' };
       }
 
       toast({
         title: "Login realizado com sucesso",
-        description: `Bem-vindo, ${usuarioData.nome}!`,
+        description: `Bem-vindo!`,
       });
 
       return { error: null };

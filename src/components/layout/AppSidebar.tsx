@@ -21,6 +21,7 @@ const menuItems = [
   { title: "Perguntas", url: "/perguntas", icon: HelpCircle, roles: ["admin", "funcionario"] },
   { title: "Respostas", url: "/respostas", icon: MessageSquare, roles: ["admin", "funcionario", "responsavel"] },
   { title: "Histórico", url: "/historico", icon: History, roles: ["admin", "funcionario", "responsavel"] },
+  { title: "Instruções", url: "/instrucoes", icon: Settings, roles: ["admin", "funcionario", "responsavel"] },
 ];
 
 export function AppSidebar() {
