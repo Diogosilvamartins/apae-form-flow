@@ -1,4 +1,4 @@
-import { Users, UserCheck, FolderOpen, HelpCircle, MessageSquare, History, Settings, Stethoscope, Calendar } from "lucide-react";
+import { BarChart3, Users, UserCheck, FolderOpen, HelpCircle, MessageSquare, History, Settings, Stethoscope, Calendar } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
   Sidebar,
@@ -15,6 +15,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 
 const menuItems = [
+  { title: "Dashboard", url: "/", icon: BarChart3, roles: ["administrador", "psicologo", "assistente_social", "secretaria"] },
   { title: "Usuários", url: "/usuarios", icon: Users, roles: ["administrador"] },
   { title: "Assistidos", url: "/assistidos", icon: UserCheck, roles: ["administrador", "psicologo", "assistente_social"] },
   { title: "Profissionais", url: "/profissionais", icon: Stethoscope, roles: ["administrador", "psicologo", "assistente_social"] },
