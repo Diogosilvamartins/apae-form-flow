@@ -19,7 +19,7 @@ export default function Agenda() {
   const [whatsappAgendamento, setWhatsappAgendamento] = useState<Agendamento | undefined>();
   const [viewMode, setViewMode] = useState<'hoje' | 'semana' | 'mes'>('hoje');
 
-  const { agendamentos, loading, createAgendamento, updateAgendamento, deleteAgendamento } = useAgendamentos();
+  const { agendamentos, loading, createAgendamento, updateAgendamento, deleteAgendamento, refetch } = useAgendamentos();
 
   const getStatusLabel = (status: StatusAgendamento) => {
     const labels: Record<StatusAgendamento, string> = {
@@ -149,10 +149,21 @@ export default function Agenda() {
           </h1>
           <p className="text-muted-foreground">Gerenciamento de consultas e atendimentos</p>
         </div>
-        <Button onClick={handleNewAgendamento} className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
-          Novo Agendamento
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => refetch()}
+            disabled={loading}
+            className="flex items-center gap-2"
+          >
+            <Clock className="h-4 w-4" />
+            {loading ? "Atualizando..." : "Atualizar"}
+          </Button>
+          <Button onClick={handleNewAgendamento} className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Novo Agendamento
+          </Button>
+        </div>
       </div>
 
       <div className="flex gap-2">
